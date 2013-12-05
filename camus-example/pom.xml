@@ -31,7 +31,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-clinet</artifactId>
+			<artifactId>hadoop-client</artifactId>
 		</dependency>
 	</dependencies>
 
