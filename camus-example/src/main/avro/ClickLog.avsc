@@ -1,0 +1,61 @@
+{
+    "namespace" : "net.daum.shopping.gargoyle.entity.common.log",
+    "type" : "record",
+    "name" : "ClickLogAvro",
+    "doc" : "클릭 로그 정의",
+    "fields" : [
+        {"name" :"log_type", "type" : "string", "default" : "test"}
+        , {"name" :"log_extension", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"log_dttm", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"log_dt", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"log_hour", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"log_tmin", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"external_inflow_domain", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"puid", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"uuid", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"suid", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"biryr", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"sex", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"userid", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"islogin", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"client_page_url", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"ip", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"referer", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"user_agent", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"svcdevice", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"svcdomain", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"section1", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"section2", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"section3", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"page_name", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"layer", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"click_url", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"click_text", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"click_img", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"click_ordernum", "type" : ["int", "null"], "default" : 0}
+        , {"name" :"click_setnum", "type" : ["int", "null"], "default" : 0}
+        , {"name" :"click_x", "type" : ["int", "null"], "default" : 0}
+        , {"name" :"click_y", "type" : ["int", "null"], "default" : 0}
+        , {"name" :"tempid", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"grpid", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"areaid", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"dataseq", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"kindcode", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"prodid", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"shopid", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"cateid", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"adc", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"ad", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"ordareaseq", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"ordaccount", "type" : ["int", "null"], "default" : 0}
+        , {"name" :"price", "type" : ["int", "null"], "default" : 0}
+        , {"name" :"cpc_price", "type" : ["int", "null"], "default" : 0}
+        , {"name" :"compseq", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"search_query", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"search_query_type", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"search_category", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"search_page", "type" : ["int", "null"], "default" : 0}
+        , {"name" :"search_qa_query", "type" : ["string", "null"], "default" : ""}
+        , {"name" :"search_view_type", "type" : ["string", "null"], "default" : ""}
+    ]
+}

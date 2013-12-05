@@ -8,9 +8,11 @@ import org.apache.hadoop.mapreduce.JobContext;
 import com.linkedin.camus.coders.MessageDecoder;
 import com.linkedin.camus.coders.MessageDecoderException;
 import com.linkedin.camus.etl.kafka.mapred.EtlInputFormat;
+import org.apache.log4j.Logger;
 
 public class MessageDecoderFactory {
-    
+    private static final Logger log = Logger.getLogger(MessageDecoderFactory.class);
+
     public static MessageDecoder<?,?> createMessageDecoder(JobContext context, String topicName){
         MessageDecoder<?,?> decoder;
         try {
@@ -25,6 +27,7 @@ public class MessageDecoderFactory {
             
             return decoder;
         } catch (Exception e) {
+            log.error(null, e);
             throw new MessageDecoderException(e);
         }    
     }

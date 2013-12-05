@@ -16,13 +16,8 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.TreeMap;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -53,6 +48,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
@@ -120,20 +116,23 @@ public class CamusJob extends Configured implements Tool {
 	}
 
 	private Job createJob(Properties props) throws IOException {
-		
-		if(getConf() == null)
-		{
-			Configuration conf = new Configuration();
-			for(Object key : props.keySet())
-			{
-				conf.set(key.toString(), props.getProperty(key.toString()));
-			}
-			setConf(conf);
-		}
+        Configuration conf = new Configuration();
+        for(Object key : props.keySet())
+        {
+            conf.set(key.toString(), props.getProperty(key.toString()));
+        }
+        setConf(conf);
+
+        log.info("hadoop conf key-value set size : " + getConf().size());
+        Iterator<Entry<String, String>> entries = getConf().iterator();
+        while(entries.hasNext()) {
+            Entry<String, String> entry = entries.next();
+            log.info(entry.getKey() + " :: " + entry.getValue());
+        }
+        UserGroupInformation.setConfiguration(getConf());
 		
 		Job job = new Job(getConf());
 		job.setJarByClass(CamusJob.class);
-		
 
 		// Set the default partitioner
 		job.getConfiguration().set(

@@ -225,6 +225,12 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 
 			// Get Metadata for all topics
 			List<TopicMetadata> topicMetadataList = getKafkaMetadata(context);
+            for(TopicMetadata topicMetadata : topicMetadataList) {
+                log.info("UNONG topic" + topicMetadata.topic() + " metadata errcode : " + topicMetadata.errorCode() + " sizeInByte" + topicMetadata.sizeInBytes());
+                for(PartitionMetadata partitionMetadata : topicMetadata.partitionsMetadata()) {
+                    log.info("UNONG partition : " + partitionMetadata.partitionId() + " : leaderhost : " + partitionMetadata.leader().host() + " sizeInByte" + partitionMetadata.sizeInBytes());
+                }
+            }
 
 			// Filter any white list topics
 			HashSet<String> whiteListTopics = new HashSet<String>(
@@ -375,6 +381,8 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 			MessageDecoderFactory.createMessageDecoder(context, topic);
 			return true;
 		} catch (Exception e) {
+            log.error(e);
+
 			return false;
 		}
 	}

@@ -1,25 +1,25 @@
 package com.linkedin.camus.etl.kafka.coders;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Properties;
-
-import kafka.message.Message;
-
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData.Record;
-import org.apache.avro.generic.GenericDatumReader;
-import org.apache.avro.io.DatumReader;
-import org.apache.avro.io.DecoderFactory;
-
 import com.linkedin.camus.coders.CamusWrapper;
 import com.linkedin.camus.coders.MessageDecoder;
 import com.linkedin.camus.coders.MessageDecoderException;
 import com.linkedin.camus.schemaregistry.CachedSchemaRegistry;
 import com.linkedin.camus.schemaregistry.SchemaRegistry;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData.Record;
+import org.apache.avro.generic.GenericDatumReader;
+import org.apache.avro.io.DatumReader;
+import org.apache.avro.io.DecoderFactory;
 import org.apache.hadoop.io.Text;
+import org.apache.log4j.Logger;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Properties;
 
 public class KafkaAvroMessageDecoder extends MessageDecoder<byte[], Record> {
+    private static final Logger log = Logger.getLogger(KafkaAvroMessageDecoder.class);
+
 	protected DecoderFactory decoderFactory;
 	protected SchemaRegistry<Schema> registry;
 	private Schema latestSchema;
@@ -31,12 +31,13 @@ public class KafkaAvroMessageDecoder extends MessageDecoder<byte[], Record> {
             SchemaRegistry<Schema> registry = (SchemaRegistry<Schema>) Class
                     .forName(
                             props.getProperty(KafkaAvroMessageEncoder.KAFKA_MESSAGE_CODER_SCHEMA_REGISTRY_CLASS)).newInstance();
-            
+
             registry.init(props);
             
             this.registry = new CachedSchemaRegistry<Schema>(registry);
             this.latestSchema = registry.getLatestSchemaByTopic(topicName).getSchema();
         } catch (Exception e) {
+            log.error(null, e);
             throw new MessageDecoderException(e);
         }
 
