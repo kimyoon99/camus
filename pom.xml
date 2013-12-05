@@ -70,11 +70,11 @@
 				<artifactId>joda-time</artifactId>
 				<version>1.6</version>
 			</dependency>
-			<dependency>
-				<groupId>org.apache.hadoop</groupId>
-				<artifactId>hadoop-core</artifactId>
-				<version>1.0.3</version>
-			</dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-client</artifactId>
+                <version>2.0.0-mr1-cdh4.1.0</version>
+            </dependency>
 			<dependency>
 				<groupId>kafka</groupId>
 				<artifactId>kafka</artifactId>
@@ -88,7 +88,7 @@
 			<dependency>
 				<groupId>org.apache.zookeeper</groupId>
 				<artifactId>zookeeper</artifactId>
-				<version>3.3.4</version>
+				<version>3.4.5</version>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
@@ -137,6 +137,18 @@
 	</issueManagement>
 
 	<repositories>
+        <repository>
+            <id>daum-shopping</id>
+            <url>http://maven.daumcorp.com/content/repositories/daum-shopping-group/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>
 		<repository>
 			<id>apache-releases</id>
 			<url>https://repository.apache.org/content/groups/public</url>
