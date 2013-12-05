@@ -62,7 +62,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.apache.avro</groupId>
-				<version>1.7.4-SNAPSHOT</version>
+				<version>1.7.5</version>
 				<artifactId>avro-repo-bundle</artifactId>
 			</dependency>
 			<dependency>
