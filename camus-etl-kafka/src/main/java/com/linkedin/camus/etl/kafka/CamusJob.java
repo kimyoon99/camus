@@ -196,7 +196,7 @@ public class CamusJob extends Configured implements Tool {
 		startTiming("total");
 		Job job = createJob(props);
 		if (getLog4jConfigure(job)) {
-			DOMConfigurator.configure("log4j.xml");
+			DOMConfigurator.configure(props.getProperty("log4j.configuration.file"));
 		}
 		FileSystem fs = FileSystem.get(job.getConfiguration());
 

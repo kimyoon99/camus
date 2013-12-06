@@ -75,6 +75,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     @Override
     public RecordWriter<EtlKey, Object> getRecordWriter(TaskAttemptContext context)
             throws IOException, InterruptedException {
+        log.info("UNONG getRecordWriter called");
         if (committer == null)
             committer = new EtlMultiOutputCommitter(getOutputPath(context), context);
         granularityMs = getMonitorTimeGranularityMins(context) * 60000L;
@@ -84,6 +85,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     private RecordWriter<IEtlKey, CamusWrapper> getDataRecordWriter(
             TaskAttemptContext context, String fileName, CamusWrapper value) throws IOException,
             InterruptedException {
+        log.info("UNONG getDataRecordWriter called");
         RecordWriterProvider recordWriterProvider = null;
         try {
             recordWriterProvider = getRecordWriterProviderClass(context).newInstance();
@@ -98,6 +100,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     @Override
     public synchronized OutputCommitter getOutputCommitter(TaskAttemptContext context)
             throws IOException {
+        log.info("UNONG getOutputCommitter called");
         if (committer == null)
             committer = new EtlMultiOutputCommitter(getOutputPath(context), context);
         granularityMs = getMonitorTimeGranularityMins(context) * 60 * 1000L;
@@ -196,6 +199,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     }
 
     public String getWorkingFileName(JobContext context, EtlKey key) throws IOException {
+        log.info("UNONG getWorkingFileName called");
         Partitioner partitioner = getPartitioner(context, key.getTopic());
         return "data." + key.getTopic().replaceAll("\\.", "_") + "." + key.getLeaderId() + "." + key.getPartition() + "." + partitioner.encodePartition(context, key);
     }
@@ -211,6 +215,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     }*/
     
     public static Partitioner getDefaultPartitioner(JobContext job) {
+        log.info("UNONG getDefaultPartitioner called");
         if(partitionersByTopic.get(ETL_DEFAULT_PARTITIONER_CLASS) == null) {
             List<Partitioner> partitioners = job.getConfiguration().getInstances(ETL_DEFAULT_PARTITIONER_CLASS, com.linkedin.camus.coders.Partitioner.class);
             partitionersByTopic.put(ETL_DEFAULT_PARTITIONER_CLASS, partitioners.get(0));
@@ -219,6 +224,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     }    
 
     public static Partitioner getPartitioner(JobContext job, String topicName) throws IOException {
+        log.info("UNONG getPartitioner called");
         String customPartitionerProperty = ETL_DEFAULT_PARTITIONER_CLASS + "." + topicName;
         if(partitionersByTopic.get(customPartitionerProperty) == null) {
             List<Partitioner> partitioners = new ArrayList<Partitioner>();//job.getConfiguration().getInstances(customPartitionerProperty, com.linkedin.camus.coders.Partitioner.class);
@@ -232,6 +238,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     }
 
     public static void resetPartitioners() {
+        log.info("UNONG resetPartitioners called");
         partitionersByTopic = new HashMap<String, Partitioner>();
     }
 
@@ -245,6 +252,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
 
         public MultiEtlRecordWriter(TaskAttemptContext context) throws IOException,
                 InterruptedException {
+            log.info("UNONG MultiEtlRecordWriter called");
             this.context = context;
             errorWriter = SequenceFile.createWriter(FileSystem.get(context.getConfiguration()),
                     context.getConfiguration(),
@@ -261,6 +269,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
 
         @Override
         public void close(TaskAttemptContext context) throws IOException, InterruptedException {
+            log.info("UNONG MultiEtlRecordWriter close called");
             for (String w : dataWriters.keySet()) {
                 dataWriters.get(w).close(context);
             }
@@ -269,6 +278,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
 
         @Override
         public void write(EtlKey key, Object val) throws IOException, InterruptedException {
+            log.info("UNONG MultiEtlRecordWriter write called");
             if (val instanceof CamusWrapper<?>) {
                 if (key.getTime() < beginTimeStamp) {
                     // ((Mapper.Context)context).getCounter("total",
@@ -314,6 +324,8 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
 
 
         public void addCounts(EtlKey key) throws IOException {
+            log.info("UNONG EtlMultiOutputCommitter addCounts called");
+
             String workingFileName = getWorkingFileName(context, key);
             if (!counts.containsKey(workingFileName))
                 counts.put(workingFileName, new EtlCounts(key.getTopic(),
@@ -323,6 +335,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
         }
 
         public void addOffset(EtlKey key) {
+            log.info("UNONG EtlMultiOutputCommitter addOffset called");
             String topicPart = key.getTopic() + "-" + key.getLeaderId() + "-" + key.getPartition();
             offsets.put(topicPart, new EtlKey(key));
         }
@@ -330,6 +343,8 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
         public EtlMultiOutputCommitter(Path outputPath, TaskAttemptContext context)
                 throws IOException {
             super(outputPath, context);
+            log.info("UNONG EtlMultiOutputCommitter called");
+
             this.context = context;
             try {
                 recordWriterProvider = getRecordWriterProviderClass(context).newInstance();
@@ -341,6 +356,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
 
         @Override
         public void commitTask(TaskAttemptContext context) throws IOException {
+            log.info("UNONG EtlMultiOutputCommitter commitTask called");
 
         	ArrayList<Map<String,Object>> allCountObject = new ArrayList<Map<String,Object>>();
             FileSystem fs = FileSystem.get(context.getConfiguration());
@@ -392,6 +408,8 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
         }
 
         public String getPartitionedPath(JobContext context, String file, int count, long offset) throws IOException {
+            log.info("UNONG EtlMultiOutputCommitter getPartitionedPath called");
+
             Matcher m = workingFileMetadataPattern.matcher(file);
             if(! m.find()) {
                 throw new IOException("Could not extract metadata from working filename '" + file + "'");

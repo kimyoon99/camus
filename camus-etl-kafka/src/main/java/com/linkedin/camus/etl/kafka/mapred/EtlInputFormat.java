@@ -66,12 +66,13 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 	public static final String ETL_IGNORE_SCHEMA_ERRORS = "etl.ignore.schema.errors";
 	public static final String ETL_AUDIT_IGNORE_SERVICE_TOPIC_LIST = "etl.audit.ignore.service.topic.list";
 
-	private final Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(EtlInputFormat.class);
 
 	@Override
 	public RecordReader<EtlKey, CamusWrapper> createRecordReader(
 			InputSplit split, TaskAttemptContext context) throws IOException,
 			InterruptedException {
+        log.info("UNONG createRecordReader called");
 		return new EtlRecordReader(split, context);
 	}
 
@@ -82,6 +83,8 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 	 * @return
 	 */
 	public List<TopicMetadata> getKafkaMetadata(JobContext context) {
+        log.info("UNONG getKafkaMetadata called");
+
 		ArrayList<String> metaRequestTopics = new ArrayList<String>();
 		CamusJob.startTiming("kafkaSetupTime");
 		String brokerString = CamusJob.getKafkaBrokers(context);
@@ -115,6 +118,8 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 	}
  
 	private SimpleConsumer createConsumer(JobContext context, String broker) {
+        log.info("UNONG createConsumer called");
+
 		String[] hostPort = broker.split(":");
 		SimpleConsumer consumer = new SimpleConsumer(
 			hostPort[0],
@@ -135,13 +140,20 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 	public ArrayList<EtlRequest> fetchLatestOffsetAndCreateEtlRequests(
 			JobContext context,
 			HashMap<LeaderInfo, ArrayList<TopicAndPartition>> offsetRequestInfo) {
+        log.info("UNONG fetchLatestOffsetAndCreateEtlRequests called :: " + offsetRequestInfo.size());
+
 		ArrayList<EtlRequest> finalRequests = new ArrayList<EtlRequest>();
 		for (LeaderInfo leader : offsetRequestInfo.keySet()) {
+            log.info("UNONG LeaderInfo " + leader.getLeaderId() + " :: " + leader.getUri().toString() + " :: " + leader.toString());
+
 			SimpleConsumer consumer = new SimpleConsumer(leader.getUri()
 					.getHost(), leader.getUri().getPort(),
 					CamusJob.getKafkaTimeoutValue(context),
 					CamusJob.getKafkaBufferSize(context),
 					CamusJob.getKafkaClientName(context));
+
+            log.info("SimpleConsumer : " + consumer.toString());
+
 			// Latest Offset
 			PartitionOffsetRequestInfo partitionLatestOffsetRequestInfo = new PartitionOffsetRequestInfo(
 					kafka.api.OffsetRequest.LatestTime(), 1);
@@ -153,6 +165,9 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 			ArrayList<TopicAndPartition> topicAndPartitions = offsetRequestInfo
 					.get(leader);
 			for (TopicAndPartition topicAndPartition : topicAndPartitions) {
+                log.info("UNONG topic & Partition :: " + topicAndPartition.topic() + " , " + topicAndPartition.partition() + " , " + topicAndPartition.toString());
+                log.info("UNONG partitionLatestOffsetRequestInfo :: " + partitionLatestOffsetRequestInfo.productPrefix() + ", " + partitionLatestOffsetRequestInfo.time() + " , " + partitionLatestOffsetRequestInfo.maxNumOffsets() + " , " + partitionLatestOffsetRequestInfo.toString());
+                log.info("UNONG partitionEarliestOffsetRequestInfo :: " + partitionEarliestOffsetRequestInfo.productPrefix() + ", " + partitionEarliestOffsetRequestInfo.time() + " , " + partitionEarliestOffsetRequestInfo.maxNumOffsets() + " , " + partitionEarliestOffsetRequestInfo.toString());
 				latestOffsetInfo.put(topicAndPartition,
 						partitionLatestOffsetRequestInfo);
 				earliestOffsetInfo.put(topicAndPartition,
@@ -163,22 +178,28 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 					.getOffsetsBefore(new OffsetRequest(latestOffsetInfo,
 							kafka.api.OffsetRequest.CurrentVersion(), CamusJob
 									.getKafkaClientName(context)));
+
 			OffsetResponse earliestOffsetResponse = consumer
 					.getOffsetsBefore(new OffsetRequest(earliestOffsetInfo,
 							kafka.api.OffsetRequest.CurrentVersion(), CamusJob
 									.getKafkaClientName(context)));
 			consumer.close();
 			for (TopicAndPartition topicAndPartition : topicAndPartitions) {
+                log.info("UNONG after consumer close " + topicAndPartition.topic() + "::" + topicAndPartition.partition());
 				long latestOffset = latestOffsetResponse.offsets(
 						topicAndPartition.topic(),
 						topicAndPartition.partition())[0];
+                log.info("UNONG after consumer close latestOffset " + latestOffset);
 				long earliestOffset = earliestOffsetResponse.offsets(
 						topicAndPartition.topic(),
 						topicAndPartition.partition())[0];
+                log.info("UNONG after consumer close earliestOffset " + earliestOffset);
 				EtlRequest etlRequest = new EtlRequest(context,
 						topicAndPartition.topic(), Integer.toString(leader
 								.getLeaderId()), topicAndPartition.partition(),
 						leader.getUri());
+                log.info("UNONG etlRequest " + etlRequest.getTopic() + ":" + etlRequest.getOffset() + ":" + etlRequest.getEarliestOffset() + ":" + etlRequest.getLastOffset() + "::" + etlRequest.toString());
+
 				etlRequest.setLatestOffset(latestOffset);
 				etlRequest.setEarliestOffset(earliestOffset);
 				finalRequests.add(etlRequest);
@@ -188,6 +209,8 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 	}
 
 	public String createTopicRegEx(HashSet<String> topicsSet) {
+        log.info("UNONG createTopicRegEx called");
+
 		String regex = "";
 		StringBuilder stringbuilder = new StringBuilder();
 		for (String whiteList : topicsSet) {
@@ -203,6 +226,8 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 	public List<TopicMetadata> filterWhitelistTopics(
 			List<TopicMetadata> topicMetadataList,
 			HashSet<String> whiteListTopics) {
+        log.info("UNONG filterWhitelistTopics called");
+
 		ArrayList<TopicMetadata> filteredTopics = new ArrayList<TopicMetadata>();
 		String regex = createTopicRegEx(whiteListTopics);
 		for (TopicMetadata topicMetadata : topicMetadataList) {
@@ -218,6 +243,8 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 	@Override
 	public List<InputSplit> getSplits(JobContext context) throws IOException,
 			InterruptedException {
+        log.info("UNONG getSplits called");
+
 		CamusJob.startTiming("getSplits");
 		ArrayList<EtlRequest> finalRequests;
 		HashMap<LeaderInfo, ArrayList<TopicAndPartition>> offsetRequestInfo = new HashMap<LeaderInfo, ArrayList<TopicAndPartition>>();
@@ -332,6 +359,8 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 				request.setOffset(key.getOffset());
 			}
 
+            log.debug("UNONG request : " + request.getTopic() + "(" + request.getEarliestOffset() + "~" + request.getLastOffset() + ")-" + request.getOffset() + "::" + request.toString());
+
 			if (request.getEarliestOffset() > request.getOffset()
 					|| request.getOffset() > request.getLastOffset()) {
 				if(request.getEarliestOffset() > request.getOffset())
@@ -351,7 +380,7 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 								request.getPartition(), 0, request
 										.getLastOffset()));
 			}
-			log.info(request);
+            log.debug("UNONG request : " + request.getTopic() + "(" + request.getEarliestOffset() + "~" + request.getLastOffset() + ")-" + request.getOffset() + "::" + request.toString());
 		}
 
 		writePrevious(offsetKeys.values(), context);
@@ -363,6 +392,8 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 	}
 
 	private Set<String> getMoveToLatestTopicsSet(JobContext context) {
+        log.info("UNONG getMoveToLatestTopicsSet called");
+
 		Set<String> topics = new HashSet<String>();
 
 		String[] arr = getMoveToLatestTopics(context);
@@ -377,6 +408,8 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 	}
 
 	private boolean createMessageDecoder(JobContext context, String topic) {
+        log.info("UNONG createMessageDecoder called");
+
 		try {
 			MessageDecoderFactory.createMessageDecoder(context, topic);
 			return true;
@@ -389,6 +422,8 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 
 	private List<InputSplit> allocateWork(List<EtlRequest> requests,
 			JobContext context) throws IOException {
+        log.info("UNONG allocateWork called");
+
 		int numTasks = context.getConfiguration()
 				.getInt("mapred.map.tasks", 30);
 		// Reverse sort by size
@@ -427,6 +462,8 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 
 	private EtlSplit getSmallestMultiSplit(List<InputSplit> kafkaETLSplits)
 			throws IOException {
+        log.info("UNONG getSmallestMultiSplit called");
+
 		EtlSplit smallest = (EtlSplit) kafkaETLSplits.get(0);
 
 		for (int i = 1; i < kafkaETLSplits.size(); i++) {
@@ -443,6 +480,8 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 
 	private void writePrevious(Collection<EtlKey> missedKeys, JobContext context)
 			throws IOException {
+        log.info("UNONG writePrevious called");
+
 		FileSystem fs = FileSystem.get(context.getConfiguration());
 		Path output = FileOutputFormat.getOutputPath(context);
 
@@ -465,9 +504,12 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 
 	private void writeRequests(List<EtlRequest> requests, JobContext context)
 			throws IOException {
+        log.info("UNONG writeRequests called");
+
 		FileSystem fs = FileSystem.get(context.getConfiguration());
 		Path output = FileOutputFormat.getOutputPath(context);
 
+        log.info("UNONG output URI :" + output.toUri() + " :: " + output.toString());
 		if (fs.exists(output)) {
 			fs.mkdirs(output);
 		}
@@ -485,8 +527,11 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 
 	private Map<EtlRequest, EtlKey> getPreviousOffsets(Path[] inputs,
 			JobContext context) throws IOException {
+        log.info("UNONG getPreviousOffsets called");
+
 		Map<EtlRequest, EtlKey> offsetKeysMap = new HashMap<EtlRequest, EtlKey>();
 		for (Path input : inputs) {
+            log.info("UNONG input Path : " + input.toString());
 			FileSystem fs = input.getFileSystem(context.getConfiguration());
 			for (FileStatus f : fs.listStatus(input, new OffsetFileFilter())) {
 				log.info("previous offset file:" + f.getPath().toString());
@@ -515,61 +560,75 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 	}
 
 	public static void setMoveToLatestTopics(JobContext job, String val) {
+        log.info("UNONG setMoveToLatestTopics called");
 		job.getConfiguration().set(KAFKA_MOVE_TO_LAST_OFFSET_LIST, val);
 	}
 
 	public static String[] getMoveToLatestTopics(JobContext job) {
+        log.info("UNONG getMoveToLatestTopics called");
 		return job.getConfiguration()
 				.getStrings(KAFKA_MOVE_TO_LAST_OFFSET_LIST);
 	}
 
 	public static void setKafkaClientBufferSize(JobContext job, int val) {
+        log.info("UNONG setKafkaClientBufferSize called");
 		job.getConfiguration().setInt(KAFKA_CLIENT_BUFFER_SIZE, val);
 	}
 
 	public static int getKafkaClientBufferSize(JobContext job) {
+        log.info("UNONG getKafkaClientBufferSize called");
 		return job.getConfiguration().getInt(KAFKA_CLIENT_BUFFER_SIZE,
 				2 * 1024 * 1024);
 	}
 
 	public static void setKafkaClientTimeout(JobContext job, int val) {
+        log.info("UNONG setKafkaClientTimeout called");
 		job.getConfiguration().setInt(KAFKA_CLIENT_SO_TIMEOUT, val);
 	}
 
 	public static int getKafkaClientTimeout(JobContext job) {
+        log.info("UNONG getKafkaClientTimeout called");
 		return job.getConfiguration().getInt(KAFKA_CLIENT_SO_TIMEOUT, 60000);
 	}
 
 	public static void setKafkaMaxPullHrs(JobContext job, int val) {
+        log.info("UNONG setKafkaMaxPullHrs called");
 		job.getConfiguration().setInt(KAFKA_MAX_PULL_HRS, val);
 	}
 
 	public static int getKafkaMaxPullHrs(JobContext job) {
+        log.info("UNONG getKafkaMaxPullHrs called");
 		return job.getConfiguration().getInt(KAFKA_MAX_PULL_HRS, -1);
 	}
 
 	public static void setKafkaMaxPullMinutesPerTask(JobContext job, int val) {
+        log.info("UNONG setKafkaMaxPullMinutesPerTask called");
 		job.getConfiguration().setInt(KAFKA_MAX_PULL_MINUTES_PER_TASK, val);
 	}
 
 	public static int getKafkaMaxPullMinutesPerTask(JobContext job) {
+        log.info("UNONG getKafkaMaxPullMinutesPerTask called");
 		return job.getConfiguration().getInt(KAFKA_MAX_PULL_MINUTES_PER_TASK,
 				-1);
 	}
 
 	public static void setKafkaMaxHistoricalDays(JobContext job, int val) {
+        log.info("UNONG setKafkaMaxHistoricalDays called");
 		job.getConfiguration().setInt(KAFKA_MAX_HISTORICAL_DAYS, val);
 	}
 
 	public static int getKafkaMaxHistoricalDays(JobContext job) {
+        log.info("UNONG getKafkaMaxHistoricalDays called");
 		return job.getConfiguration().getInt(KAFKA_MAX_HISTORICAL_DAYS, -1);
 	}
 
 	public static void setKafkaBlacklistTopic(JobContext job, String val) {
+        log.info("UNONG setKafkaBlacklistTopic called");
 		job.getConfiguration().set(KAFKA_BLACKLIST_TOPIC, val);
 	}
 
 	public static String[] getKafkaBlacklistTopic(JobContext job) {
+        log.info("UNONG getKafkaBlacklistTopic called");
 		if (job.getConfiguration().get(KAFKA_BLACKLIST_TOPIC) != null
 				&& !job.getConfiguration().get(KAFKA_BLACKLIST_TOPIC).isEmpty()) {
 			return job.getConfiguration().getStrings(KAFKA_BLACKLIST_TOPIC);
@@ -579,10 +638,12 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 	}
 
 	public static void setKafkaWhitelistTopic(JobContext job, String val) {
+        log.info("UNONG setKafkaWhitelistTopic called");
 		job.getConfiguration().set(KAFKA_WHITELIST_TOPIC, val);
 	}
 
 	public static String[] getKafkaWhitelistTopic(JobContext job) {
+        log.info("UNONG getKafkaWhitelistTopic called");
 		if (job.getConfiguration().get(KAFKA_WHITELIST_TOPIC) != null
 				&& !job.getConfiguration().get(KAFKA_WHITELIST_TOPIC).isEmpty()) {
 			return job.getConfiguration().getStrings(KAFKA_WHITELIST_TOPIC);
@@ -592,31 +653,37 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 	}
 
 	public static void setEtlIgnoreSchemaErrors(JobContext job, boolean val) {
+        log.info("UNONG setEtlIgnoreSchemaErrors called");
 		job.getConfiguration().setBoolean(ETL_IGNORE_SCHEMA_ERRORS, val);
 	}
 
 	public static boolean getEtlIgnoreSchemaErrors(JobContext job) {
+        log.info("UNONG getEtlIgnoreSchemaErrors called");
 		return job.getConfiguration().getBoolean(ETL_IGNORE_SCHEMA_ERRORS,
 				false);
 	}
 
 	public static void setEtlAuditIgnoreServiceTopicList(JobContext job,
 			String topics) {
+        log.info("UNONG setEtlAuditIgnoreServiceTopicList called");
 		job.getConfiguration().set(ETL_AUDIT_IGNORE_SERVICE_TOPIC_LIST, topics);
 	}
 
 	public static String[] getEtlAuditIgnoreServiceTopicList(JobContext job) {
+        log.info("UNONG getEtlAuditIgnoreServiceTopicList called");
 		return job.getConfiguration().getStrings(
 				ETL_AUDIT_IGNORE_SERVICE_TOPIC_LIST, "");
 	}
 
 	public static void setMessageDecoderClass(JobContext job,
 			Class<MessageDecoder> cls) {
+        log.info("UNONG setMessageDecoderClass called");
 		job.getConfiguration().setClass(CAMUS_MESSAGE_DECODER_CLASS, cls,
 				MessageDecoder.class);
 	}
 
 	public static Class<MessageDecoder> getMessageDecoderClass(JobContext job) {
+        log.info("UNONG getMessageDecoderClass called");
 		return (Class<MessageDecoder>) job.getConfiguration().getClass(
 				CAMUS_MESSAGE_DECODER_CLASS, KafkaAvroMessageDecoder.class);
 	}
@@ -625,6 +692,7 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 
 		@Override
 		public boolean accept(Path arg0) {
+            log.info("UNONG OffsetFileFilter.accept called");
 			return arg0.getName()
 					.startsWith(EtlMultiOutputFormat.OFFSET_PREFIX);
 		}
