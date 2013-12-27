@@ -10,13 +10,14 @@ import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.InputSplit;
 
 import com.linkedin.camus.etl.kafka.common.EtlRequest;
+import org.apache.log4j.Logger;
 
 public class EtlSplit extends InputSplit implements Writable {
+    private static Logger log = Logger.getLogger(EtlSplit.class);
+
 	private List<EtlRequest> requests = new ArrayList<EtlRequest>();
 	private long length = 0;
 
-	
-	
 	@Override
 	public void readFields(DataInput in) throws IOException {
 		int size = in.readInt();
@@ -31,8 +32,11 @@ public class EtlSplit extends InputSplit implements Writable {
 	@Override
 	public void write(DataOutput out) throws IOException {
 		out.writeInt(requests.size());
-		for (EtlRequest r : requests)
-			r.write(out);
+        log.info("UNONG writeSplit requests.size() :: " + requests.size());
+		for (EtlRequest r : requests) {
+            r.write(out);
+            log.info("UNONG writeSplit request :: " + r.toString());
+        }
 	}
 
 	@Override
@@ -60,4 +64,15 @@ public class EtlSplit extends InputSplit implements Writable {
 		else
 			return null;
 	}
+
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("legnth::").append(length).append(",").append("requestsSize::").append(requests.size()).append("[");
+        for(EtlRequest request : requests) {
+            sb.append(request).append("||");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
 }

@@ -9,6 +9,7 @@ import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.specific.SpecificDatumWriter;
+import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
@@ -47,7 +48,7 @@ public class AvroRecordWriterProvider implements RecordWriterProvider {
 
         Path path = committer.getWorkPath();
         path = new Path(path, EtlMultiOutputFormat.getUniqueFile(context, fileName, EXT));
-        writer.create(((GenericRecord) data.getRecord()).getSchema(),
+        writer.create(((SpecificRecordBase) data.getRecord()).getSchema(),
                 path.getFileSystem(context.getConfiguration()).create(path));
 
         writer.setSyncInterval(EtlMultiOutputFormat.getEtlAvroWriterSyncInterval(context));

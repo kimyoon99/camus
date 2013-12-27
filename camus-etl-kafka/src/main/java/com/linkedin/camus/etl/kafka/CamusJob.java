@@ -1,51 +1,27 @@
 package com.linkedin.camus.etl.kafka;
 
-import com.linkedin.camus.etl.kafka.common.DateUtils;
-import com.linkedin.camus.etl.kafka.common.EtlCounts;
-import com.linkedin.camus.etl.kafka.common.EtlKey;
-import com.linkedin.camus.etl.kafka.common.ExceptionWritable;
-import com.linkedin.camus.etl.kafka.common.Source;
+import com.linkedin.camus.etl.kafka.common.*;
 import com.linkedin.camus.etl.kafka.mapred.EtlInputFormat;
+import com.linkedin.camus.etl.kafka.mapred.EtlMapper;
 import com.linkedin.camus.etl.kafka.mapred.EtlMultiOutputFormat;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.NumberFormat;
-import java.util.*;
-import java.util.Map.Entry;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.*;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.filecache.DistributedCache;
-import org.apache.hadoop.fs.ContentSummary;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.*;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.JobID;
-import org.apache.hadoop.mapred.TIPStatus;
-import org.apache.hadoop.mapred.TaskCompletionEvent;
 import org.apache.hadoop.mapred.TaskReport;
-import org.apache.hadoop.mapreduce.Counter;
-import org.apache.hadoop.mapreduce.CounterGroup;
-import org.apache.hadoop.mapreduce.Counters;
+import org.apache.hadoop.mapred.TIPStatus;
+
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapred.TaskCompletionEvent;
+import org.apache.hadoop.mapreduce.Counters;
+import org.apache.hadoop.mapreduce.Counter;
 import org.apache.hadoop.mapreduce.JobContext;
+import org.apache.hadoop.mapreduce.CounterGroup;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -59,6 +35,13 @@ import org.codehaus.jackson.type.TypeReference;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
+
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.NumberFormat;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class CamusJob extends Configured implements Tool {
 
@@ -149,8 +132,12 @@ public class CamusJob extends Configured implements Tool {
 		{
 			job.setJobName(job.getConfiguration().get("camus.job.name"));
 		}
-		
-		
+
+//        FileSystem fs = (FileSystem) ReflectionUtils.newInstance(DistributedFileSystem.class, conf);
+        URI uri = FileSystem.getDefaultUri(job.getConfiguration());
+        log.info("UNONG fs uri ::" + uri);
+        Class clz = FileSystem.getFileSystemClass(uri.getScheme(), job.getConfiguration());
+        log.info("UNONG clz name " + clz.getName());
 		FileSystem fs = FileSystem.get(job.getConfiguration());
 
 		String hadoopCacheJarDir = job.getConfiguration().get(
@@ -198,7 +185,12 @@ public class CamusJob extends Configured implements Tool {
 		if (getLog4jConfigure(job)) {
 			DOMConfigurator.configure(props.getProperty("log4j.configuration.file"));
 		}
-		FileSystem fs = FileSystem.get(job.getConfiguration());
+//        FileSystem fs = (FileSystem) ReflectionUtils.newInstance(DistributedFileSystem.class, job.getConfiguration());
+        URI uri = FileSystem.getDefaultUri(job.getConfiguration());
+        log.info("UNONG fs uri ::" + uri);
+        Class clz = FileSystem.getFileSystemClass(uri.getScheme(), job.getConfiguration());
+        log.info("UNONG clz name " + clz.getName());
+        FileSystem fs = FileSystem.get(job.getConfiguration());
 
 		log.info("Dir Destination set to: "
 				+ EtlMultiOutputFormat.getDestinationPath(job));
@@ -256,7 +248,7 @@ public class CamusJob extends Configured implements Tool {
 		// output directory in a normal run, but instead written to the
 		// appropriate date-partitioned subdir in camus.destination.path
 		DateTimeFormatter dateFmt = DateUtils.getDateTimeFormatter(
-				"YYYY-MM-dd-HH-mm-ss", DateTimeZone.UTC);
+				"YYYY-MM-dd-HH-mm-ss", DateTimeZone.forTimeZone(TimeZone.getDefault()));
 		Path newExecutionOutput = new Path(execBasePath,
 				new DateTime().toString(dateFmt));
 		FileOutputFormat.setOutputPath(job, newExecutionOutput);
@@ -264,12 +256,21 @@ public class CamusJob extends Configured implements Tool {
 				+ newExecutionOutput.toString());
 
 		job.setInputFormatClass(EtlInputFormat.class);
+//        job.setMapperClass(EtlMapper.class);
 		job.setOutputFormatClass(EtlMultiOutputFormat.class);
 		job.setNumReduceTasks(0);
 
 		stopTiming("pre-setup");
+
 		job.submit();
 		job.waitForCompletion(true);
+
+        log.info("after submit job configuration : " + job.getConfiguration().size());
+        Iterator<Entry<String, String>> entries = job.getConfiguration().iterator();
+        while(entries.hasNext()) {
+            Entry<String, String> entry = entries.next();
+            log.info(entry.getKey() + " :: " + entry.getValue());
+        }
 
 		// dump all counters
 		Counters counters = job.getCounters();
@@ -298,11 +299,9 @@ public class CamusJob extends Configured implements Tool {
 		createReport(job, timingMap);
 
 		if (!job.isSuccessful()) {
-			JobClient client = new JobClient(
-					new JobConf(job.getConfiguration()));
-
+//            Cluster client = new Cluster(job.getConfiguration());
+            JobClient client = new JobClient(job.getConfiguration());
 			TaskCompletionEvent[] tasks = job.getTaskCompletionEvents(0);
-
 			for (TaskReport task : client.getMapTaskReports(tasks[0]
 					.getTaskAttemptId().getJobID())) {
 				if (task.getCurrentStatus().equals(TIPStatus.FAILED)) {
@@ -464,10 +463,10 @@ public class CamusJob extends Configured implements Tool {
 		sb.append(String.format("Total: %d minutes %d seconds\n", minutes,
 				seconds));
 
-		JobClient client = new JobClient(new JobConf(job.getConfiguration()));
-
-		TaskReport[] tasks = client.getMapTaskReports(JobID.downgrade(job
-				.getJobID()));
+		JobClient client = new JobClient(job.getConfiguration());
+		TaskReport[] tasks = client.getMapTaskReports(
+                org.apache.hadoop.mapred.JobID.downgrade(job.getJobID())
+        );
 
 		double min = Long.MAX_VALUE, max = 0, mean = 0;
 		double minRun = Long.MAX_VALUE, maxRun = 0, meanRun = 0;

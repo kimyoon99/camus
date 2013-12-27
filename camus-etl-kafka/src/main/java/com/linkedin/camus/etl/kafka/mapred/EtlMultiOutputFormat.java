@@ -4,27 +4,15 @@ import com.linkedin.camus.coders.CamusWrapper;
 import com.linkedin.camus.coders.Partitioner;
 import com.linkedin.camus.etl.IEtlKey;
 import com.linkedin.camus.etl.RecordWriterProvider;
-import com.linkedin.camus.etl.kafka.coders.DefaultPartitioner;
-import com.linkedin.camus.etl.kafka.common.AvroRecordWriterProvider;
-import com.linkedin.camus.etl.kafka.common.DateUtils;
-import com.linkedin.camus.etl.kafka.common.EtlCounts;
-import com.linkedin.camus.etl.kafka.common.EtlKey;
-import com.linkedin.camus.etl.kafka.common.ExceptionWritable;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.linkedin.camus.etl.kafka.common.*;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.SequenceFile.Writer;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.OutputCommitter;
 import org.apache.hadoop.mapreduce.RecordWriter;
@@ -35,6 +23,16 @@ import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
+
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * MultipleAvroOutputFormat.
@@ -60,7 +58,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     public static final String ETL_RECORD_WRITER_PROVIDER_CLASS = "etl.record.writer.provider.class";
 
     public static final DateTimeFormatter FILE_DATE_FORMATTER = DateUtils
-            .getDateTimeFormatter("YYYYMMddHH");
+            .getDateTimeFormatter("YYYYMMddkk");
     public static final String OFFSET_PREFIX = "offsets";
     public static final String ERRORS_PREFIX = "errors";
     public static final String COUNTS_PREFIX = "counts";
@@ -108,99 +106,123 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     }
 
     public static void setRecordWriterProviderClass(JobContext job, Class<RecordWriterProvider> recordWriterProviderClass) {
+        log.info("UNONG setRecordWriterProviderClass called");
         job.getConfiguration().setClass(ETL_RECORD_WRITER_PROVIDER_CLASS, recordWriterProviderClass, RecordWriterProvider.class);
     }
 
     public static Class<RecordWriterProvider> getRecordWriterProviderClass(
             JobContext job) {
+        log.info("UNONG getRecordWriterProviderClass called");
         return (Class<RecordWriterProvider>) job.getConfiguration()
                 .getClass(ETL_RECORD_WRITER_PROVIDER_CLASS,
                         AvroRecordWriterProvider.class);
     }
 
     public static void setDefaultTimeZone(JobContext job, String tz) {
+        log.info("UNONG setDefaultTimeZone called");
         job.getConfiguration().set(ETL_DEFAULT_TIMEZONE, tz);
     }
 
     public static String getDefaultTimeZone(JobContext job) {
+        log.info("UNONG getDefaultTimeZone called");
         return job.getConfiguration().get(ETL_DEFAULT_TIMEZONE, "America/Los_Angeles");
     }
 
     public static void setDestinationPath(JobContext job, Path dest) {
+        log.info("UNONG setDestinationPath called");
         job.getConfiguration().set(ETL_DESTINATION_PATH, dest.toString());
     }
 
     public static Path getDestinationPath(JobContext job) {
+        log.info("UNONG getDestinationPath called");
         return new Path(job.getConfiguration().get(ETL_DESTINATION_PATH));
     }
 
     public static void setDestPathTopicSubDir(JobContext job, String subPath) {
+        log.info("UNONG setDestPathTopicSubDir called");
         job.getConfiguration().set(ETL_DESTINATION_PATH_TOPIC_SUBDIRECTORY, subPath);
     }
 
     public static Path getDestPathTopicSubDir(JobContext job) {
+        log.info("UNONG getDestPathTopicSubDir called");
         return new Path(job.getConfiguration().get(ETL_DESTINATION_PATH_TOPIC_SUBDIRECTORY, "hourly"));
     }
 
     public static void setMonitorTimeGranularityMins(JobContext job, int mins) {
+        log.info("UNONG setMonitorTimeGranularityMins called");
         job.getConfiguration().setInt(KAFKA_MONITOR_TIME_GRANULARITY_MS, mins);
     }
 
     public static int getMonitorTimeGranularityMins(JobContext job) {
+        log.info("UNONG getMonitorTimeGranularityMins called");
         return job.getConfiguration().getInt(KAFKA_MONITOR_TIME_GRANULARITY_MS, 10);
     }
 
     public static void setEtlAvroWriterSyncInterval(JobContext job, int val) {
+        log.info("UNONG setEtlAvroWriterSyncInterval called");
         job.getConfiguration().setInt(ETL_AVRO_WRITER_SYNC_INTERVAL, val);
     }
 
     public static int getEtlAvroWriterSyncInterval(JobContext job) {
+        log.info("UNONG getEtlAvroWriterSyncInterval called");
         return job.getConfiguration().getInt(ETL_AVRO_WRITER_SYNC_INTERVAL, 16000);
     }
 
     public static void setEtlDeflateLevel(JobContext job, int val) {
+        log.info("UNONG setEtlDeflateLevel called");
         job.getConfiguration().setInt(ETL_DEFLATE_LEVEL, val);
     }
 
     public static void setEtlOutputCodec(JobContext job, String codec) {
+        log.info("UNONG setEtlOutputCodec called");
         job.getConfiguration().set(ETL_OUTPUT_CODEC, codec);
     }
 
     public static String getEtlOutputCodec(JobContext job) {
+        log.info("UNONG getEtlOutputCodec called");
         return job.getConfiguration().get(ETL_OUTPUT_CODEC, ETL_DEFAULT_OUTPUT_CODEC);
 
     }
     public static int getEtlDeflateLevel(JobContext job) {
+        log.info("UNONG getEtlDeflateLevel called");
         return job.getConfiguration().getInt(ETL_DEFLATE_LEVEL, 6);
     }
 
     public static int getEtlOutputFileTimePartitionMins(JobContext job) {
+        log.info("UNONG getEtlOutputFileTimePartitionMins called");
         return job.getConfiguration().getInt(ETL_OUTPUT_FILE_TIME_PARTITION_MINS, 60);
     }
 
     public static void setEtlOutputFileTimePartitionMins(JobContext job, int val) {
+        log.info("UNONG setEtlOutputFileTimePartitionMins called");
         job.getConfiguration().setInt(ETL_OUTPUT_FILE_TIME_PARTITION_MINS, val);
     }
 
     public static boolean isRunMoveData(JobContext job) {
+        log.info("UNONG isRunMoveData called");
         return job.getConfiguration().getBoolean(ETL_RUN_MOVE_DATA, true);
     }
 
     public static void setRunMoveData(JobContext job, boolean value) {
+        log.info("UNONG setRunMoveData called");
         job.getConfiguration().setBoolean(ETL_RUN_MOVE_DATA, value);
     }
 
     public static boolean isRunTrackingPost(JobContext job) {
+        log.info("UNONG isRunTrackingPost called");
         return job.getConfiguration().getBoolean(ETL_RUN_TRACKING_POST, false);
     }
 
     public static void setRunTrackingPost(JobContext job, boolean value) {
+        log.info("UNONG setRunTrackingPost called");
         job.getConfiguration().setBoolean(ETL_RUN_TRACKING_POST, value);
     }
 
     public String getWorkingFileName(JobContext context, EtlKey key) throws IOException {
         log.info("UNONG getWorkingFileName called");
         Partitioner partitioner = getPartitioner(context, key.getTopic());
+
+        // TODO unong : 여기 데이터의 시간 정보도 나오게..
         return "data." + key.getTopic().replaceAll("\\.", "_") + "." + key.getLeaderId() + "." + key.getPartition() + "." + partitioner.encodePartition(context, key);
     }
 
@@ -265,12 +287,15 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
             } else {
                 beginTimeStamp = 0;
             }
+
+            log.info("UNONG MultiEtlRecordWriter beginTimeStamp : " + beginTimeStamp);
         }
 
         @Override
         public void close(TaskAttemptContext context) throws IOException, InterruptedException {
             log.info("UNONG MultiEtlRecordWriter close called");
             for (String w : dataWriters.keySet()) {
+                log.info("UNONG MultiEtlRecordWriter close dataWritersKey :: " + w);
                 dataWriters.get(w).close(context);
             }
             errorWriter.close();
@@ -279,7 +304,11 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
         @Override
         public void write(EtlKey key, Object val) throws IOException, InterruptedException {
             log.info("UNONG MultiEtlRecordWriter write called");
+//            key.put(new Text("object"), new ObjectWritable(val));
+
             if (val instanceof CamusWrapper<?>) {
+                log.info("UNONG etlKey getTime :: " + key.getTime());
+
                 if (key.getTime() < beginTimeStamp) {
                     // ((Mapper.Context)context).getCounter("total",
                     // "skip-old").increment(1);
@@ -296,7 +325,9 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
 
                     committer.addCounts(key);
                     CamusWrapper value = (CamusWrapper) val;
+                    // TODO unong : 여기 val 값중 시간값으로 workingFileName 에 명시..
                     String workingFileName = getWorkingFileName(context, key);
+                    log.info("UNONG write workingFileName : " + workingFileName + " :: " + value.toString());
                     if (!dataWriters.containsKey(workingFileName)) {
                         dataWriters.put(
                                 workingFileName,
@@ -362,17 +393,24 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
             FileSystem fs = FileSystem.get(context.getConfiguration());
             if (isRunMoveData(context)) {
                 Path workPath = super.getWorkPath();
+                log.info("UNONG commitTask workPath :: " + workPath.toString());
                 Path baseOutDir = getDestinationPath(context);
+                log.info("UNONG commitTask baseOutDir :: " + baseOutDir.toString());
                 for (FileStatus f : fs.listStatus(workPath)) {
                     String file = f.getPath().getName();
+                    log.info("UNONG commitTask file :: " + file);
                     if (file.startsWith("data")) {
                         String workingFileName = file.substring(0, file.lastIndexOf("-m"));
+                        log.info("UNONG commitTask workingFileName :: " + workingFileName);
                         EtlCounts count = counts.get(workingFileName);
+                        log.info("UNONG commitTask EtlCounts topic :: " + count.getTopic() + ", " + count.getLastKey().toString());
 
                         String partitionedFile = getPartitionedPath(context, file,
                                 count.getEventCount(), count.getLastKey().getOffset());
+                        log.info("UNONG commitTask partitionedFile :: " + partitionedFile);
 
                         Path dest = new Path(baseOutDir, partitionedFile);
+                        log.info("UNONG commitTask dest :: " + dest.toString());
 
                         if (!fs.exists(dest.getParent())) {
                                 fs.mkdirs(dest.getParent());
@@ -388,6 +426,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
                 }
 
                 Path tempPath = new Path(workPath, "counts." + context.getConfiguration().get("mapred.task.id"));
+                log.info("UNONG commitTask tempPath :: " + tempPath.toString());
                 OutputStream outputStream = new BufferedOutputStream(fs.create(tempPath));
                 ObjectMapper mapper= new ObjectMapper();
                 log.info("Writing counts to : " + tempPath.toString());
@@ -401,6 +440,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
                     new Path(super.getWorkPath(), getUniqueFile(context, OFFSET_PREFIX, "")),
                     EtlKey.class, NullWritable.class);
             for (String s : offsets.keySet()) {
+                log.info("UNONG commitTask offsets :: " + s + " :: " + offsets.get(s).toString());
                 offsetWriter.append(offsets.get(s), NullWritable.get());
             }
             offsetWriter.close();

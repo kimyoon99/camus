@@ -66,6 +66,8 @@ public class EtlRecordReader extends RecordReader<EtlKey, CamusWrapper> {
      */
     public EtlRecordReader(InputSplit split, TaskAttemptContext context) throws IOException,
             InterruptedException {
+        log.warn("UNONG EtlRecordReader");
+
         initialize(split, context);
     }
 
@@ -73,10 +75,13 @@ public class EtlRecordReader extends RecordReader<EtlKey, CamusWrapper> {
     @Override
     public void initialize(InputSplit split, TaskAttemptContext context) throws IOException,
             InterruptedException {
+        log.warn("UNONG initialize");
+
         this.split = (EtlSplit) split;
         this.context = context;
 
         if (context instanceof Mapper.Context) {
+            log.info("UNONG context is mapper.context");
             mapperContext = (Context) context;
         }
 
@@ -84,6 +89,7 @@ public class EtlRecordReader extends RecordReader<EtlKey, CamusWrapper> {
 
         if (EtlInputFormat.getKafkaMaxPullHrs(context) != -1) {
             this.maxPullHours = EtlInputFormat.getKafkaMaxPullHrs(context);
+            log.info("UNONG maxPullHours : " + this.maxPullHours);
         } else {
             this.endTimeStamp = Long.MAX_VALUE;
         }
@@ -92,13 +98,16 @@ public class EtlRecordReader extends RecordReader<EtlKey, CamusWrapper> {
             DateTime now = new DateTime();
             this.maxPullTime = now.plusMinutes(
                     EtlInputFormat.getKafkaMaxPullMinutesPerTask(context)).getMillis();
+            log.info("UNONG maxPullTime : " + this.maxPullTime);
         } else {
             this.maxPullTime = Long.MAX_VALUE;
         }
 
         if (EtlInputFormat.getKafkaMaxHistoricalDays(context) != -1) {
             int maxDays = EtlInputFormat.getKafkaMaxHistoricalDays(context);
+            log.info("UNONG maxDays : " + maxDays);
             beginTimeStamp = (new DateTime()).minusDays(maxDays).getMillis();
+            log.info("UNONG beginTimeStamp : " + this.beginTimeStamp);
         } else {
             beginTimeStamp = 0;
         }
@@ -106,10 +115,18 @@ public class EtlRecordReader extends RecordReader<EtlKey, CamusWrapper> {
         ignoreServerServiceList = new HashSet<String>();
         for(String ignoreServerServiceTopic : EtlInputFormat.getEtlAuditIgnoreServiceTopicList(context))
         {
+            log.info("UNONG ignoreServerServiceTopic :: " + ignoreServerServiceTopic);
         	ignoreServerServiceList.add(ignoreServerServiceTopic);
         }
 
         this.totalBytes = this.split.getLength();
+
+        log.info("UNONG split.getNumRequests : " + this.split.getNumRequests());
+        log.info("UNONG skipSchemaErrors : " + this.skipSchemaErrors);
+        log.info("UNONG maxPullHours : " + this.maxPullHours);
+        log.info("UNONG maxPullTime : " + this.maxPullTime);
+        log.info("UNONG beginTimeStamp : " + this.beginTimeStamp);
+        log.info("UNONG totalBytes : " + this.totalBytes);
     }
 
     @Override

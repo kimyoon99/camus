@@ -1,8 +1,10 @@
 package com.linkedin.camus.coders;
 
+import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
+import org.apache.log4j.Logger;
 
 /**
  * Container for messages.  Enables the use of a custom message decoder with knowledge
@@ -13,12 +15,15 @@ import org.apache.hadoop.io.Writable;
  * @param <R> The type of decoded payload
  */
 public class CamusWrapper<R> {
+    private static Logger log = Logger.getLogger(CamusWrapper.class);
+
     private R record;
     private long timestamp;
     private MapWritable partitionMap;
 
     public CamusWrapper(R record) {
         this(record, System.currentTimeMillis());
+        log.info("UNONG record :: " + record.toString() + " :: " + record.getClass().getName());
     }
 
     public CamusWrapper(R record, long timestamp) {
@@ -48,6 +53,9 @@ public class CamusWrapper<R> {
     public long getTimestamp() {
         return timestamp;
     }
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
 
     /**
      * Add a value for partitions
@@ -71,4 +79,12 @@ public class CamusWrapper<R> {
         return partitionMap;
     }
 
+    @Override
+    public String toString() {
+        return "CamusWrapper{" +
+                "partitionMap=" + partitionMap +
+                ", record=" + record +
+                ", timestamp=" + timestamp +
+                '}';
+    }
 }

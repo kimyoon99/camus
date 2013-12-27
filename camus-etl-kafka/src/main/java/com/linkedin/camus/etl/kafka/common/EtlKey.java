@@ -11,12 +11,15 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.UTF8;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
+import org.apache.log4j.Logger;
 
 /**
  * The key for the mapreduce job to pull kafka. Contains offsets and the
  * checksum.
  */
 public class EtlKey implements WritableComparable<EtlKey>, IEtlKey {
+    private static Logger log = Logger.getLogger(EtlKey.class);
+
     public static final Text SERVER = new Text("server");
     public static final Text SERVICE = new Text("service");
     public static EtlKey DUMMY_KEY = new EtlKey();
@@ -156,6 +159,8 @@ public class EtlKey implements WritableComparable<EtlKey>, IEtlKey {
 
 	@Override
 	public void readFields(DataInput in) throws IOException {
+        log.info("UNONG EtlKey readFields called");
+
 		this.leaderId = UTF8.readString(in);
 		this.partition = in.readInt();
 		this.beginOffset = in.readLong();
@@ -176,6 +181,8 @@ public class EtlKey implements WritableComparable<EtlKey>, IEtlKey {
 
 	@Override
 	public void write(DataOutput out) throws IOException {
+        log.info("UNONG EtlKey write called");
+
 		UTF8.writeString(out, this.leaderId);
 		out.writeInt(this.partition);
 		out.writeLong(this.beginOffset);

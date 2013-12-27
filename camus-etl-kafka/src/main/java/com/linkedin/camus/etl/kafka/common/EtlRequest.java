@@ -14,6 +14,7 @@ import kafka.javaapi.OffsetRequest;
 import kafka.javaapi.OffsetResponse;
 import kafka.javaapi.consumer.SimpleConsumer;
 
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.UTF8;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.JobContext;
@@ -290,9 +291,9 @@ public class EtlRequest implements Writable {
 
     @Override
     public void readFields(DataInput in) throws IOException {
-        topic = UTF8.readString(in);
-        leaderId = UTF8.readString(in);
-        String str = UTF8.readString(in);
+        topic = Text.readString(in);
+        leaderId = Text.readString(in);
+        String str = Text.readString(in);
         if (!str.isEmpty())
             try {
                 uri = new URI(str);
@@ -306,14 +307,23 @@ public class EtlRequest implements Writable {
 
     @Override
     public void write(DataOutput out) throws IOException {
-        UTF8.writeString(out, topic);
-        UTF8.writeString(out, leaderId);
-        if (uri != null)
-            UTF8.writeString(out, uri.toString());
-        else
-            UTF8.writeString(out, "");
+        Text.writeString(out, topic);
+        log.info("UNONG writeSplit topic :: " + topic);
+        Text.writeString(out, leaderId);
+        log.info("UNONG writeSplit leaderId :: " + leaderId);
+        if (uri != null) {
+            Text.writeString(out, uri.toString());
+            log.info("UNONG writeSplit uri :: " + uri.toString());
+        }
+        else {
+            Text.writeString(out, "");
+            log.info("UNONG writeSplit uri empty String");
+        }
         out.writeInt(partition);
+        log.info("UNONG writeSplit partition :: " + partition);
         out.writeLong(offset);
+        log.info("UNONG writeSplit offset :: " + offset);
         out.writeLong(latestOffset);
+        log.info("UNONG writeSplit latestOffset :: " + latestOffset);
     }
 }

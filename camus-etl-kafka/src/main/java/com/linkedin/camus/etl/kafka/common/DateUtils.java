@@ -6,7 +6,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 public class DateUtils {
-	public static DateTimeZone PST = DateTimeZone.forID("America/Los_Angeles");
+//	public static DateTimeZone PST = DateTimeZone.forID("America/Los_Angeles");
+public static DateTimeZone PST = DateTimeZone.forID("Asia/Seoul");
 	public static DateTimeFormatter MINUTE_FORMATTER = getDateTimeFormatter("YYYY-MM-dd-HH-mm");
 
 	public static DateTimeFormatter getDateTimeFormatter(String str) {

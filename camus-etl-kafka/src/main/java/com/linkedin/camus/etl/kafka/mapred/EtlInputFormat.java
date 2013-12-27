@@ -36,11 +36,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.SequenceFile;
-import org.apache.hadoop.mapreduce.InputFormat;
-import org.apache.hadoop.mapreduce.InputSplit;
-import org.apache.hadoop.mapreduce.JobContext;
-import org.apache.hadoop.mapreduce.RecordReader;
-import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.log4j.Logger;
@@ -68,13 +64,28 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 
 	private static final Logger log = Logger.getLogger(EtlInputFormat.class);
 
-	@Override
-	public RecordReader<EtlKey, CamusWrapper> createRecordReader(
-			InputSplit split, TaskAttemptContext context) throws IOException,
-			InterruptedException {
-        log.info("UNONG createRecordReader called");
-		return new EtlRecordReader(split, context);
-	}
+//    @Override
+//    public org.apache.hadoop.mapred.RecordReader<EtlKey, CamusWrapper> getRecordReader(org.apache.hadoop.mapred.InputSplit inputSplit, org.apache.hadoop.mapred.JobConf entries, org.apache.hadoop.mapred.Reporter reporter) throws IOException {
+//        log.info("UNONG getRecordReader called");
+//
+//        return null;  //To change body of implemented methods use File | Settings | File Templates.
+//    }
+
+    @Override
+    public RecordReader<EtlKey, CamusWrapper> createRecordReader(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
+        log.error("UNONG createRecordReader called split length :: " + split.getLength());
+
+        if(split.getLocations() != null ) {
+            log.error("UNONG createRecordReader split location count :: " + split.getLocations().length);
+            for(String lo : split.getLocations()) {
+                log.error("UNONG createRecordReader :: " + lo);
+            }
+        } else {
+            log.error("UNONG split no locations ");
+        }
+
+        return new EtlRecordReader(split, context);
+    }
 
 	/**
 	 * Gets the metadata from Kafka
@@ -240,9 +251,14 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 		return filteredTopics;
 	}
 
-	@Override
-	public List<InputSplit> getSplits(JobContext context) throws IOException,
-			InterruptedException {
+//    @Override
+//    public org.apache.hadoop.mapred.InputSplit[] getSplits(org.apache.hadoop.mapred.JobConf entries, int i) throws IOException {
+//        log.info("UNONG older getSplits called");
+//        return new org.apache.hadoop.mapred.InputSplit[0];
+//    }
+
+    @Override
+    public List<InputSplit> getSplits(JobContext context) throws IOException, InterruptedException {
         log.info("UNONG getSplits called");
 
 		CamusJob.startTiming("getSplits");
@@ -388,7 +404,11 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 		CamusJob.stopTiming("getSplits");
 		CamusJob.startTiming("hadoop");
 		CamusJob.setTime("hadoop_start");
-		return allocateWork(finalRequests, context);
+
+        List<InputSplit> kafkaETLSplits = allocateWork(finalRequests, context);
+
+        log.info("UNONG kafkaETLSplits size : " + kafkaETLSplits.size() + " finished getSplits");
+		return kafkaETLSplits;
 	}
 
 	private Set<String> getMoveToLatestTopicsSet(JobContext context) {
@@ -422,7 +442,7 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 
 	private List<InputSplit> allocateWork(List<EtlRequest> requests,
 			JobContext context) throws IOException {
-        log.info("UNONG allocateWork called");
+        log.info("UNONG allocateWork called : requestSize = " + requests.size());
 
 		int numTasks = context.getConfiguration()
 				.getInt("mapred.map.tasks", 30);
@@ -447,6 +467,7 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 			EtlSplit split = new EtlSplit();
 
 			if (requests.size() > 0) {
+                log.debug("UNONG split request : " + requests.get(0).toString());
 				split.addRequest(requests.get(0));
 				kafkaETLSplits.add(split);
 				requests.remove(0);
@@ -542,6 +563,7 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 					EtlRequest request = new EtlRequest(context,
 							key.getTopic(), key.getLeaderId(),
 							key.getPartition());
+                    log.debug("UNONG previous offset request : " + request.toString());
 					if (offsetKeysMap.containsKey(request)) {
 
 						EtlKey oldKey = offsetKeysMap.get(request);
@@ -688,11 +710,14 @@ public class EtlInputFormat extends InputFormat<EtlKey, CamusWrapper> {
 				CAMUS_MESSAGE_DECODER_CLASS, KafkaAvroMessageDecoder.class);
 	}
 
-	private class OffsetFileFilter implements PathFilter {
+
+
+
+    private class OffsetFileFilter implements PathFilter {
 
 		@Override
 		public boolean accept(Path arg0) {
-            log.info("UNONG OffsetFileFilter.accept called");
+            log.info("UNONG OffsetFileFilter.accept called : " + arg0.toString());
 			return arg0.getName()
 					.startsWith(EtlMultiOutputFormat.OFFSET_PREFIX);
 		}

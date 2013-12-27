@@ -50,6 +50,11 @@
 				<artifactId>log4j</artifactId>
 				<version>1.2.17</version>
 			</dependency>
+            <dependency>
+                <groupId>org.apache.avro</groupId>
+                <version>1.7.4-SNAPSHOT</version>
+                <artifactId>avro-repo-bundle</artifactId>
+            </dependency>
 			<dependency>
 				<groupId>org.apache.avro</groupId>
 				<artifactId>avro</artifactId>
@@ -60,20 +65,20 @@
 				<artifactId>avro-mapred</artifactId>
 				<version>1.7.5</version>
 			</dependency>
-			<dependency>
-				<groupId>org.apache.avro</groupId>
-				<version>1.7.4-SNAPSHOT</version>
-				<artifactId>avro-repo-bundle</artifactId>
-			</dependency>
-			<dependency>
+            <dependency>
 				<groupId>joda-time</groupId>
 				<artifactId>joda-time</artifactId>
 				<version>1.6</version>
 			</dependency>
             <dependency>
                 <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-yarn-common</artifactId>
+                <version>2.0.0-cdh4.3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
                 <artifactId>hadoop-client</artifactId>
-                <version>2.0.0-mr1-cdh4.1.0</version>
+                <version>2.0.0-mr1-cdh4.3.0</version>
             </dependency>
 			<dependency>
 				<groupId>kafka</groupId>
@@ -137,6 +142,10 @@
 	</issueManagement>
 
 	<repositories>
+        <repository>
+            <id>cloudera</id>
+            <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+        </repository>
         <repository>
             <id>daum-shopping</id>
             <url>http://maven.daumcorp.com/content/repositories/daum-shopping-group/</url>

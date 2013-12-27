@@ -15,6 +15,7 @@ public class GargoyleSchemaRegistry extends MemorySchemaRegistry<Schema> {
     public GargoyleSchemaRegistry(Configuration conf) {
         super();
         super.register("ggLogTest", ClickLogAvro.newBuilder().build().getSchema());
+        super.register("gClickLogResult", ClickLogAvro.newBuilder().build().getSchema());
     }
 
     public GargoyleSchemaRegistry()  {
