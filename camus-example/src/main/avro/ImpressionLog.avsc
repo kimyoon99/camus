@@ -1,0 +1,70 @@
+{
+    "namespace" : "net.daum.shopping.gargoyle.entity.common.log",
+    "type" : "record",
+    "name" : "ImpressionLogAvro",
+    "doc" : "노출 로그 정의",
+    "fields" : [
+        {"name" :"log_type", "type" : ["string", "null"], "default" : "abnormal"}
+        , {"name" :"log_extension", "type" : ["null", "string"], "default" : null}
+        , {"name" :"log_dttm", "type" : ["null", "string"], "default" : null}
+        , {"name" :"log_dt", "type" : ["null", "string"], "default" : null}
+        , {"name" :"log_hour", "type" : ["null", "string"], "default" : null}
+        , {"name" :"log_tmin", "type" : ["null", "string"], "default" : null}
+        , {"name" :"log_timestamp", "type" : ["null", "long"], "default" : null}
+        , {"name" :"external_inflow_domain", "type" : ["null", "string"], "default" : null}
+        , {"name" :"puid", "type" : ["null", "string"], "default" : null}
+        , {"name" :"uuid", "type" : ["null", "string"], "default" : null}
+        , {"name" :"suid", "type" : ["null", "string"], "default" : null}
+        , {"name" :"biryr", "type" : ["null", "string"], "default" : null}
+        , {"name" :"sex", "type" : ["null", "string"], "default" : null}
+        , {"name" :"userid", "type" : ["null", "string"], "default" : null}
+        , {"name" :"islogin", "type" : ["null", "string"], "default" : null}
+        , {"name" :"client_page_url", "type" : ["null", "string"], "default" : null}
+        , {"name" :"ip", "type" : ["null", "string"], "default" : null}
+        , {"name" :"referer", "type" : ["null", "string"], "default" : null}
+        , {"name" :"user_agent", "type" : ["null", "string"], "default" : null}
+        , {"name" :"svcdevice", "type" : ["null", "string"], "default" : null}
+        , {"name" :"svcdomain", "type" : ["null", "string"], "default" : null}
+        , {"name" :"section1", "type" : ["null", "string"], "default" : null}
+        , {"name" :"section2", "type" : ["null", "string"], "default" : null}
+        , {"name" :"section3", "type" : ["null", "string"], "default" : null}
+        , {"name" :"page_name", "type" : ["null", "string"], "default" : null}
+        , {"name" :"search_query", "type" : ["null", "string"], "default" : null}
+        , {"name" :"search_query_type", "type" : ["null", "string"], "default" : null}
+        , {"name" :"search_category", "type" : ["null", "string"], "default" : null}
+        , {"name" :"search_page", "type" : ["null", "int"], "default" : null}
+        , {"name" :"search_view_type", "type" : ["null", "string"], "default" : null}
+        , {"name" : "prod_area_list", "type" : ["null",
+            { "type" : "array",
+                "items" : {
+                    "name" : "ProdArea",
+                    "type" : "record",
+                    "fields" : [
+                        {"name" : "layer", "type" : ["null", "string"], "default" : null}
+                        ,{"name" : "tmplid", "type" : ["null", "string"], "default" : null}
+                        ,{"name" : "grpid", "type" : ["null", "string"], "default" : null}
+                        ,{"name" : "areaid", "type" : ["null", "string"], "default" : null}
+                        ,{"name" : "prods",
+                            "type" : ["null", {
+                                "type" : "array",
+                                "items" : {
+                                    "name" : "Prod",
+                                    "type" : "record",
+                                    "fields" : [
+                                        {"name" : "order1", "type" : ["null", "int"], "default" : null}
+                                        ,{"name" : "order2", "type" : ["null", "int"], "default" : null}
+                                        ,{"name" : "dataseq", "type" : ["null", "string"], "default" : null}
+                                        ,{"name" : "prodid", "type" : ["null", "string"], "default" : null}
+                                        ,{"name" : "cateid", "type" : ["null", "string"], "default" : null}
+                                        ,{"name" : "shopid", "type" : ["null", "string"], "default" : null}
+                                    ]
+                                }
+                            }], "default" : null}
+                    ]
+                }
+            }
+        ], "default" : null}
+        , {"name" :"has_error", "type" : ["null", "boolean"], "default" : null}
+        , {"name" :"error_code", "type" : ["null", "string"], "default" : null}
+    ]
+}

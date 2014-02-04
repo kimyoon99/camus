@@ -2,7 +2,6 @@ package com.linkedin.camus.etl.kafka;
 
 import com.linkedin.camus.etl.kafka.common.*;
 import com.linkedin.camus.etl.kafka.mapred.EtlInputFormat;
-import com.linkedin.camus.etl.kafka.mapred.EtlMapper;
 import com.linkedin.camus.etl.kafka.mapred.EtlMultiOutputFormat;
 import org.apache.commons.cli.*;
 import org.apache.commons.cli.Options;
@@ -13,15 +12,10 @@ import org.apache.hadoop.fs.*;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.TaskReport;
 import org.apache.hadoop.mapred.TIPStatus;
-
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapred.TaskCompletionEvent;
-import org.apache.hadoop.mapreduce.Counters;
-import org.apache.hadoop.mapreduce.Counter;
-import org.apache.hadoop.mapreduce.JobContext;
-import org.apache.hadoop.mapreduce.CounterGroup;
+import org.apache.hadoop.mapred.TaskReport;
+import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -142,10 +136,12 @@ public class CamusJob extends Configured implements Tool {
 
 		String hadoopCacheJarDir = job.getConfiguration().get(
 				"hdfs.default.classpath.dir", null);
+        log.info("UNONG hadoopCacheJarDir : " + hadoopCacheJarDir);
 		if (hadoopCacheJarDir != null) {
 			FileStatus[] status = fs.listStatus(new Path(hadoopCacheJarDir));
 
 			if (status != null) {
+                log.info("UNONG hadoopCacheJarDir status is not null and size :: " + status.length);
 				for (int i = 0; i < status.length; ++i) {
 					if (!status[i].isDir()) {
 						log.info("Adding Jar to Distributed Cache Archive File:"
@@ -157,7 +153,7 @@ public class CamusJob extends Configured implements Tool {
 					}
 				}
 			} else {
-				System.out.println("hdfs.default.classpath.dir "
+                log.info("hdfs.default.classpath.dir "
 						+ hadoopCacheJarDir + " is empty.");
 			}
 		}

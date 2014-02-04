@@ -3,7 +3,6 @@ package com.linkedin.camus.etl.kafka.coders;
 import com.linkedin.camus.coders.CamusWrapper;
 import com.linkedin.camus.coders.MessageDecoder;
 import com.linkedin.camus.coders.MessageDecoderException;
-import com.linkedin.camus.etl.kafka.common.DateUtils;
 import com.linkedin.camus.schemaregistry.CachedSchemaRegistry;
 import com.linkedin.camus.schemaregistry.SchemaRegistry;
 import org.apache.avro.Schema;
@@ -71,11 +70,15 @@ public class GargoyleLogTimeStampMessageDecoder extends MessageDecoder<byte[], S
                     )
             );
 
-//            long timestamp = (Long)record.get("log_timestamp");
-            Utf8 logdttm = (Utf8)record.get(schema.getField("log_dttm").pos());
-            log.info("UNONG logdttm :: " + logdttm.toString());
-            long timestamp = DateUtils.getDateTimeFormatter("yyyyMMddkkmmss").parseMillis(logdttm.toString());
-            log.info("UNONG payload logdttm=" + logdttm + ", timestamp=" + timestamp);
+//            Utf8 logdttm = (Utf8)record.get(schema.getField("log_dttm").pos());
+//            log.info("UNONG logdttm :: " + logdttm.toString());
+//            long timestamp = DateUtils.getDateTimeFormatter("yyyyMMddkkmmss").parseMillis(logdttm.toString());
+//            log.info("UNONG payload logdttm=" + logdttm + ", timestamp=" + timestamp);
+
+            Utf8 log_timestamp = (Utf8)record.get(schema.getField("log_timestamp").pos());
+            log.info("UNONG logdttm :: " + log_timestamp.toString());
+            long timestamp = Long.parseLong(log_timestamp.toString());
+            log.info("UNONG payload logdttm=" + log_timestamp + ", timestamp=" + timestamp);
 
             return new CamusWrapper<SpecificRecordBase>(record, timestamp);
         }

@@ -9,7 +9,7 @@
 
 	<groupId>com.linkedin.camus</groupId>
 	<artifactId>camus-parent</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.2.5</version>
 	<packaging>pom</packaging>
 	<name>Camus Parent</name>
 	<description>
@@ -26,22 +26,22 @@
 			<dependency>
 				<groupId>com.linkedin.camus</groupId>
 				<artifactId>camus-api</artifactId>
-				<version>0.1.0-SNAPSHOT</version>
+				<version>0.2.4</version>
 			</dependency>
 			<dependency>
 				<groupId>com.linkedin.camus</groupId>
 				<artifactId>camus-etl-kafka</artifactId>
-				<version>0.1.0-SNAPSHOT</version>
+				<version>0.2.4</version>
 			</dependency>
 			<dependency>
 				<groupId>com.linkedin.camus</groupId>
 				<artifactId>camus-schema-registry</artifactId>
-				<version>0.1.0-SNAPSHOT</version>
+				<version>0.2.4</version>
 			</dependency>
 			<dependency>
 				<groupId>com.linkedin.camus</groupId>
 				<artifactId>camus-schema-registry</artifactId>
-				<version>0.1.0-SNAPSHOT</version>
+				<version>0.2.4</version>
 				<type>test-jar</type>
 				<scope>test</scope>
 			</dependency>
@@ -54,6 +54,20 @@
                 <groupId>org.apache.avro</groupId>
                 <version>1.7.4-SNAPSHOT</version>
                 <artifactId>avro-repo-bundle</artifactId>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>slf4j-api</artifactId>
+                        <groupId>org.slf4j</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>slf4j-simple</artifactId>
+                        <groupId>org.slf4j</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jcl-over-slf4j</artifactId>
+                        <groupId>org.slf4j</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 			<dependency>
 				<groupId>org.apache.avro</groupId>
@@ -70,21 +84,26 @@
 				<artifactId>joda-time</artifactId>
 				<version>1.6</version>
 			</dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-yarn-common</artifactId>
-                <version>2.0.0-cdh4.3.0</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.apache.hadoop</groupId>-->
+                <!--<artifactId>hadoop-yarn-common</artifactId>-->
+                <!--<version>2.0.0-cdh4.3.0</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>org.apache.hadoop</groupId>
                 <artifactId>hadoop-client</artifactId>
                 <version>2.0.0-mr1-cdh4.3.0</version>
             </dependency>
-			<dependency>
-				<groupId>kafka</groupId>
-				<artifactId>kafka</artifactId>
-				<version>0.8-SNAPSHOT</version>
-			</dependency>
+			<!--<dependency>-->
+				<!--<groupId>kafka</groupId>-->
+				<!--<artifactId>kafka</artifactId>-->
+				<!--<version>0.8-SNAPSHOT</version>-->
+			<!--</dependency>-->
+            <dependency>
+                <groupId>kafka</groupId>
+                <artifactId>kafka_2.8.0</artifactId>
+                <version>0.8.0</version>
+            </dependency>
 			<dependency>
 				<groupId>com.github.sgroschupf</groupId>
 				<artifactId>zkclient</artifactId>
@@ -163,6 +182,20 @@
 			<url>https://repository.apache.org/content/groups/public</url>
 		</repository>
 	</repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>daum</id>
+            <name>Daum Repository</name>
+            <url>http://maven.daumcorp.com/content/repositories/daum</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>daum-snapshots</id>
+            <name>Daum Snapshot Repository</name>
+            <url>http://maven.daumcorp.com/content/repositories/daum-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 	<build>
 		<plugins>

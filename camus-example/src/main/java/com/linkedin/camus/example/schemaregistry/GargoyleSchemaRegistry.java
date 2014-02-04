@@ -2,6 +2,7 @@ package com.linkedin.camus.example.schemaregistry;
 
 import com.linkedin.camus.schemaregistry.MemorySchemaRegistry;
 import net.daum.shopping.gargoyle.entity.common.log.ClickLogAvro;
+import net.daum.shopping.gargoyle.entity.common.log.ImpressionLogAvro;
 import org.apache.avro.Schema;
 import org.apache.hadoop.conf.Configuration;
 
@@ -14,8 +15,8 @@ import org.apache.hadoop.conf.Configuration;
 public class GargoyleSchemaRegistry extends MemorySchemaRegistry<Schema> {
     public GargoyleSchemaRegistry(Configuration conf) {
         super();
-        super.register("ggLogTest", ClickLogAvro.newBuilder().build().getSchema());
         super.register("gClickLogResult", ClickLogAvro.newBuilder().build().getSchema());
+        super.register("gImpressionLogResult", ImpressionLogAvro.newBuilder().build().getSchema());
     }
 
     public GargoyleSchemaRegistry()  {
