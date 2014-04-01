@@ -1,17 +1,13 @@
 package com.linkedin.camus.etl.kafka.common;
 
+import com.linkedin.camus.etl.IEtlKey;
+import org.apache.hadoop.io.*;
+import org.apache.log4j.Logger;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Map;
-
-import com.linkedin.camus.etl.IEtlKey;
-import org.apache.hadoop.io.MapWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.UTF8;
-import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.io.WritableComparable;
-import org.apache.log4j.Logger;
 
 /**
  * The key for the mapreduce job to pull kafka. Contains offsets and the
@@ -159,7 +155,7 @@ public class EtlKey implements WritableComparable<EtlKey>, IEtlKey {
 
 	@Override
 	public void readFields(DataInput in) throws IOException {
-        log.info("UNONG EtlKey readFields called");
+        log.debug("UNONG EtlKey readFields called");
 
 		this.leaderId = UTF8.readString(in);
 		this.partition = in.readInt();
@@ -181,7 +177,7 @@ public class EtlKey implements WritableComparable<EtlKey>, IEtlKey {
 
 	@Override
 	public void write(DataOutput out) throws IOException {
-        log.info("UNONG EtlKey write called");
+        log.debug("UNONG EtlKey write called");
 
 		UTF8.writeString(out, this.leaderId);
 		out.writeInt(this.partition);

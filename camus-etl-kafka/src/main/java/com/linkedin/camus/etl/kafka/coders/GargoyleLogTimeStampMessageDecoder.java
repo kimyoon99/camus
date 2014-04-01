@@ -9,7 +9,6 @@ import org.apache.avro.Schema;
 import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificRecordBase;
-import org.apache.avro.util.Utf8;
 import org.apache.log4j.Logger;
 
 import java.util.Properties;
@@ -61,7 +60,7 @@ public class GargoyleLogTimeStampMessageDecoder extends MessageDecoder<byte[], S
             Schema schema = registry.getLatestSchemaByTopic(super.topicName).getSchema();
             reader.setSchema(schema);
 
-            log.info("UNONG payloadString :: " + 0 + "(" + (payload.length) + ")");
+            log.debug("UNONG payloadString :: " + 0 + "(" + (payload.length) + ")");
             SpecificRecordBase record = reader.read(
                     null,
                     decoderFactory.binaryDecoder(
@@ -75,12 +74,10 @@ public class GargoyleLogTimeStampMessageDecoder extends MessageDecoder<byte[], S
 //            long timestamp = DateUtils.getDateTimeFormatter("yyyyMMddkkmmss").parseMillis(logdttm.toString());
 //            log.info("UNONG payload logdttm=" + logdttm + ", timestamp=" + timestamp);
 
-            Utf8 log_timestamp = (Utf8)record.get(schema.getField("log_timestamp").pos());
-            log.info("UNONG logdttm :: " + log_timestamp.toString());
-            long timestamp = Long.parseLong(log_timestamp.toString());
-            log.info("UNONG payload logdttm=" + log_timestamp + ", timestamp=" + timestamp);
+            Long log_timestamp = (Long) record.get(schema.getField("log_timestamp").pos());
+            log.info("UNONG payload logdttm=" + log_timestamp);
 
-            return new CamusWrapper<SpecificRecordBase>(record, timestamp);
+            return new CamusWrapper<SpecificRecordBase>(record, log_timestamp);
         }
         catch (Exception e)
         {

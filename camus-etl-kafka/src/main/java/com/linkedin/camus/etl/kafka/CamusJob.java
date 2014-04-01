@@ -100,11 +100,11 @@ public class CamusJob extends Configured implements Tool {
         }
         setConf(conf);
 
-        log.info("hadoop conf key-value set size : " + getConf().size());
+        log.debug("hadoop conf key-value set size : " + getConf().size());
         Iterator<Entry<String, String>> entries = getConf().iterator();
         while(entries.hasNext()) {
             Entry<String, String> entry = entries.next();
-            log.info(entry.getKey() + " :: " + entry.getValue());
+            log.debug(entry.getKey() + " :: " + entry.getValue());
         }
         UserGroupInformation.setConfiguration(getConf());
 		
@@ -129,19 +129,19 @@ public class CamusJob extends Configured implements Tool {
 
 //        FileSystem fs = (FileSystem) ReflectionUtils.newInstance(DistributedFileSystem.class, conf);
         URI uri = FileSystem.getDefaultUri(job.getConfiguration());
-        log.info("UNONG fs uri ::" + uri);
+        log.debug("UNONG fs uri ::" + uri);
         Class clz = FileSystem.getFileSystemClass(uri.getScheme(), job.getConfiguration());
-        log.info("UNONG clz name " + clz.getName());
+        log.debug("UNONG clz name " + clz.getName());
 		FileSystem fs = FileSystem.get(job.getConfiguration());
 
 		String hadoopCacheJarDir = job.getConfiguration().get(
 				"hdfs.default.classpath.dir", null);
-        log.info("UNONG hadoopCacheJarDir : " + hadoopCacheJarDir);
+        log.debug("UNONG hadoopCacheJarDir : " + hadoopCacheJarDir);
 		if (hadoopCacheJarDir != null) {
 			FileStatus[] status = fs.listStatus(new Path(hadoopCacheJarDir));
 
 			if (status != null) {
-                log.info("UNONG hadoopCacheJarDir status is not null and size :: " + status.length);
+                log.debug("UNONG hadoopCacheJarDir status is not null and size :: " + status.length);
 				for (int i = 0; i < status.length; ++i) {
 					if (!status[i].isDir()) {
 						log.info("Adding Jar to Distributed Cache Archive File:"
@@ -153,7 +153,7 @@ public class CamusJob extends Configured implements Tool {
 					}
 				}
 			} else {
-                log.info("hdfs.default.classpath.dir "
+                log.warn("hdfs.default.classpath.dir "
 						+ hadoopCacheJarDir + " is empty.");
 			}
 		}
@@ -183,9 +183,9 @@ public class CamusJob extends Configured implements Tool {
 		}
 //        FileSystem fs = (FileSystem) ReflectionUtils.newInstance(DistributedFileSystem.class, job.getConfiguration());
         URI uri = FileSystem.getDefaultUri(job.getConfiguration());
-        log.info("UNONG fs uri ::" + uri);
+        log.debug("UNONG fs uri ::" + uri);
         Class clz = FileSystem.getFileSystemClass(uri.getScheme(), job.getConfiguration());
-        log.info("UNONG clz name " + clz.getName());
+        log.debug("UNONG clz name " + clz.getName());
         FileSystem fs = FileSystem.get(job.getConfiguration());
 
 		log.info("Dir Destination set to: "
@@ -302,7 +302,7 @@ public class CamusJob extends Configured implements Tool {
 					.getTaskAttemptId().getJobID())) {
 				if (task.getCurrentStatus().equals(TIPStatus.FAILED)) {
 					for (String s : task.getDiagnostics()) {
-						System.err.println("task error: " + s);
+						log.error("task error: " + s);
 					}
 				}
 			}

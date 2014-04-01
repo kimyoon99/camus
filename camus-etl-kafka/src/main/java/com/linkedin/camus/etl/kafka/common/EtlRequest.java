@@ -1,5 +1,15 @@
 package com.linkedin.camus.etl.kafka.common;
 
+import kafka.api.PartitionOffsetRequestInfo;
+import kafka.common.TopicAndPartition;
+import kafka.javaapi.OffsetRequest;
+import kafka.javaapi.OffsetResponse;
+import kafka.javaapi.consumer.SimpleConsumer;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.mapreduce.JobContext;
+import org.apache.log4j.Logger;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -7,20 +17,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
-
-import kafka.api.PartitionOffsetRequestInfo;
-import kafka.common.TopicAndPartition;
-import kafka.javaapi.OffsetRequest;
-import kafka.javaapi.OffsetResponse;
-import kafka.javaapi.consumer.SimpleConsumer;
-
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.UTF8;
-import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapreduce.JobContext;
-import org.apache.log4j.Logger;
-
-import com.linkedin.camus.etl.kafka.CamusJob;
 
 /**
  * A class that represents the kafka pull request.
@@ -308,22 +304,22 @@ public class EtlRequest implements Writable {
     @Override
     public void write(DataOutput out) throws IOException {
         Text.writeString(out, topic);
-        log.info("UNONG writeSplit topic :: " + topic);
+        log.debug("UNONG writeSplit topic :: " + topic);
         Text.writeString(out, leaderId);
-        log.info("UNONG writeSplit leaderId :: " + leaderId);
+        log.debug("UNONG writeSplit leaderId :: " + leaderId);
         if (uri != null) {
             Text.writeString(out, uri.toString());
-            log.info("UNONG writeSplit uri :: " + uri.toString());
+            log.debug("UNONG writeSplit uri :: " + uri.toString());
         }
         else {
             Text.writeString(out, "");
-            log.info("UNONG writeSplit uri empty String");
+            log.debug("UNONG writeSplit uri empty String");
         }
         out.writeInt(partition);
-        log.info("UNONG writeSplit partition :: " + partition);
+        log.debug("UNONG writeSplit partition :: " + partition);
         out.writeLong(offset);
-        log.info("UNONG writeSplit offset :: " + offset);
+        log.debug("UNONG writeSplit offset :: " + offset);
         out.writeLong(latestOffset);
-        log.info("UNONG writeSplit latestOffset :: " + latestOffset);
+        log.debug("UNONG writeSplit latestOffset :: " + latestOffset);
     }
 }

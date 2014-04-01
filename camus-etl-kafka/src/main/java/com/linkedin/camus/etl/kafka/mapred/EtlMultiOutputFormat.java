@@ -9,10 +9,8 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.SequenceFile.Writer;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.OutputCommitter;
 import org.apache.hadoop.mapreduce.RecordWriter;
@@ -73,7 +71,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     @Override
     public RecordWriter<EtlKey, Object> getRecordWriter(TaskAttemptContext context)
             throws IOException, InterruptedException {
-        log.info("UNONG getRecordWriter called");
+        log.debug("UNONG getRecordWriter called");
         if (committer == null)
             committer = new EtlMultiOutputCommitter(getOutputPath(context), context);
         granularityMs = getMonitorTimeGranularityMins(context) * 60000L;
@@ -83,7 +81,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     private RecordWriter<IEtlKey, CamusWrapper> getDataRecordWriter(
             TaskAttemptContext context, String fileName, CamusWrapper value) throws IOException,
             InterruptedException {
-        log.info("UNONG getDataRecordWriter called");
+        log.debug("UNONG getDataRecordWriter called");
         RecordWriterProvider recordWriterProvider = null;
         try {
             recordWriterProvider = getRecordWriterProviderClass(context).newInstance();
@@ -98,7 +96,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     @Override
     public synchronized OutputCommitter getOutputCommitter(TaskAttemptContext context)
             throws IOException {
-        log.info("UNONG getOutputCommitter called");
+        log.debug("UNONG getOutputCommitter called");
         if (committer == null)
             committer = new EtlMultiOutputCommitter(getOutputPath(context), context);
         granularityMs = getMonitorTimeGranularityMins(context) * 60 * 1000L;
@@ -106,120 +104,120 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     }
 
     public static void setRecordWriterProviderClass(JobContext job, Class<RecordWriterProvider> recordWriterProviderClass) {
-        log.info("UNONG setRecordWriterProviderClass called");
+        log.debug("UNONG setRecordWriterProviderClass called");
         job.getConfiguration().setClass(ETL_RECORD_WRITER_PROVIDER_CLASS, recordWriterProviderClass, RecordWriterProvider.class);
     }
 
     public static Class<RecordWriterProvider> getRecordWriterProviderClass(
             JobContext job) {
-        log.info("UNONG getRecordWriterProviderClass called");
+        log.debug("UNONG getRecordWriterProviderClass called");
         return (Class<RecordWriterProvider>) job.getConfiguration()
                 .getClass(ETL_RECORD_WRITER_PROVIDER_CLASS,
                         AvroRecordWriterProvider.class);
     }
 
     public static void setDefaultTimeZone(JobContext job, String tz) {
-        log.info("UNONG setDefaultTimeZone called");
+        log.debug("UNONG setDefaultTimeZone called");
         job.getConfiguration().set(ETL_DEFAULT_TIMEZONE, tz);
     }
 
     public static String getDefaultTimeZone(JobContext job) {
-        log.info("UNONG getDefaultTimeZone called");
+        log.debug("UNONG getDefaultTimeZone called");
         return job.getConfiguration().get(ETL_DEFAULT_TIMEZONE, "America/Los_Angeles");
     }
 
     public static void setDestinationPath(JobContext job, Path dest) {
-        log.info("UNONG setDestinationPath called");
+        log.debug("UNONG setDestinationPath called");
         job.getConfiguration().set(ETL_DESTINATION_PATH, dest.toString());
     }
 
     public static Path getDestinationPath(JobContext job) {
-        log.info("UNONG getDestinationPath called");
+        log.debug("UNONG getDestinationPath called");
         return new Path(job.getConfiguration().get(ETL_DESTINATION_PATH));
     }
 
     public static void setDestPathTopicSubDir(JobContext job, String subPath) {
-        log.info("UNONG setDestPathTopicSubDir called");
+        log.debug("UNONG setDestPathTopicSubDir called");
         job.getConfiguration().set(ETL_DESTINATION_PATH_TOPIC_SUBDIRECTORY, subPath);
     }
 
     public static Path getDestPathTopicSubDir(JobContext job) {
-        log.info("UNONG getDestPathTopicSubDir called");
+        log.debug("UNONG getDestPathTopicSubDir called");
         return new Path(job.getConfiguration().get(ETL_DESTINATION_PATH_TOPIC_SUBDIRECTORY, "hourly"));
     }
 
     public static void setMonitorTimeGranularityMins(JobContext job, int mins) {
-        log.info("UNONG setMonitorTimeGranularityMins called");
+        log.debug("UNONG setMonitorTimeGranularityMins called");
         job.getConfiguration().setInt(KAFKA_MONITOR_TIME_GRANULARITY_MS, mins);
     }
 
     public static int getMonitorTimeGranularityMins(JobContext job) {
-        log.info("UNONG getMonitorTimeGranularityMins called");
+        log.debug("UNONG getMonitorTimeGranularityMins called");
         return job.getConfiguration().getInt(KAFKA_MONITOR_TIME_GRANULARITY_MS, 10);
     }
 
     public static void setEtlAvroWriterSyncInterval(JobContext job, int val) {
-        log.info("UNONG setEtlAvroWriterSyncInterval called");
+        log.debug("UNONG setEtlAvroWriterSyncInterval called");
         job.getConfiguration().setInt(ETL_AVRO_WRITER_SYNC_INTERVAL, val);
     }
 
     public static int getEtlAvroWriterSyncInterval(JobContext job) {
-        log.info("UNONG getEtlAvroWriterSyncInterval called");
+        log.debug("UNONG getEtlAvroWriterSyncInterval called");
         return job.getConfiguration().getInt(ETL_AVRO_WRITER_SYNC_INTERVAL, 16000);
     }
 
     public static void setEtlDeflateLevel(JobContext job, int val) {
-        log.info("UNONG setEtlDeflateLevel called");
+        log.debug("UNONG setEtlDeflateLevel called");
         job.getConfiguration().setInt(ETL_DEFLATE_LEVEL, val);
     }
 
     public static void setEtlOutputCodec(JobContext job, String codec) {
-        log.info("UNONG setEtlOutputCodec called");
+        log.debug("UNONG setEtlOutputCodec called");
         job.getConfiguration().set(ETL_OUTPUT_CODEC, codec);
     }
 
     public static String getEtlOutputCodec(JobContext job) {
-        log.info("UNONG getEtlOutputCodec called");
+        log.debug("UNONG getEtlOutputCodec called");
         return job.getConfiguration().get(ETL_OUTPUT_CODEC, ETL_DEFAULT_OUTPUT_CODEC);
 
     }
     public static int getEtlDeflateLevel(JobContext job) {
-        log.info("UNONG getEtlDeflateLevel called");
+        log.debug("UNONG getEtlDeflateLevel called");
         return job.getConfiguration().getInt(ETL_DEFLATE_LEVEL, 6);
     }
 
     public static int getEtlOutputFileTimePartitionMins(JobContext job) {
-        log.info("UNONG getEtlOutputFileTimePartitionMins called");
+        log.debug("UNONG getEtlOutputFileTimePartitionMins called");
         return job.getConfiguration().getInt(ETL_OUTPUT_FILE_TIME_PARTITION_MINS, 60);
     }
 
     public static void setEtlOutputFileTimePartitionMins(JobContext job, int val) {
-        log.info("UNONG setEtlOutputFileTimePartitionMins called");
+        log.debug("UNONG setEtlOutputFileTimePartitionMins called");
         job.getConfiguration().setInt(ETL_OUTPUT_FILE_TIME_PARTITION_MINS, val);
     }
 
     public static boolean isRunMoveData(JobContext job) {
-        log.info("UNONG isRunMoveData called");
+        log.debug("UNONG isRunMoveData called");
         return job.getConfiguration().getBoolean(ETL_RUN_MOVE_DATA, true);
     }
 
     public static void setRunMoveData(JobContext job, boolean value) {
-        log.info("UNONG setRunMoveData called");
+        log.debug("UNONG setRunMoveData called");
         job.getConfiguration().setBoolean(ETL_RUN_MOVE_DATA, value);
     }
 
     public static boolean isRunTrackingPost(JobContext job) {
-        log.info("UNONG isRunTrackingPost called");
+        log.debug("UNONG isRunTrackingPost called");
         return job.getConfiguration().getBoolean(ETL_RUN_TRACKING_POST, false);
     }
 
     public static void setRunTrackingPost(JobContext job, boolean value) {
-        log.info("UNONG setRunTrackingPost called");
+        log.debug("UNONG setRunTrackingPost called");
         job.getConfiguration().setBoolean(ETL_RUN_TRACKING_POST, value);
     }
 
     public String getWorkingFileName(JobContext context, EtlKey key) throws IOException {
-        log.info("UNONG getWorkingFileName called");
+        log.debug("UNONG getWorkingFileName called");
         Partitioner partitioner = getPartitioner(context, key.getTopic());
 
         // TODO unong : 여기 데이터의 시간 정보도 나오게..
@@ -237,7 +235,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     }*/
     
     public static Partitioner getDefaultPartitioner(JobContext job) {
-        log.info("UNONG getDefaultPartitioner called");
+        log.debug("UNONG getDefaultPartitioner called");
         if(partitionersByTopic.get(ETL_DEFAULT_PARTITIONER_CLASS) == null) {
             List<Partitioner> partitioners = job.getConfiguration().getInstances(ETL_DEFAULT_PARTITIONER_CLASS, com.linkedin.camus.coders.Partitioner.class);
             partitionersByTopic.put(ETL_DEFAULT_PARTITIONER_CLASS, partitioners.get(0));
@@ -246,7 +244,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     }    
 
     public static Partitioner getPartitioner(JobContext job, String topicName) throws IOException {
-        log.info("UNONG getPartitioner called");
+        log.debug("UNONG getPartitioner called");
         String customPartitionerProperty = ETL_DEFAULT_PARTITIONER_CLASS + "." + topicName;
         if(partitionersByTopic.get(customPartitionerProperty) == null) {
             List<Partitioner> partitioners = new ArrayList<Partitioner>();//job.getConfiguration().getInstances(customPartitionerProperty, com.linkedin.camus.coders.Partitioner.class);
@@ -260,7 +258,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     }
 
     public static void resetPartitioners() {
-        log.info("UNONG resetPartitioners called");
+        log.debug("UNONG resetPartitioners called");
         partitionersByTopic = new HashMap<String, Partitioner>();
     }
 
@@ -274,7 +272,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
 
         public MultiEtlRecordWriter(TaskAttemptContext context) throws IOException,
                 InterruptedException {
-            log.info("UNONG MultiEtlRecordWriter called");
+            log.debug("UNONG MultiEtlRecordWriter called");
             this.context = context;
             errorWriter = SequenceFile.createWriter(FileSystem.get(context.getConfiguration()),
                     context.getConfiguration(),
@@ -293,7 +291,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
 
         @Override
         public void close(TaskAttemptContext context) throws IOException, InterruptedException {
-            log.info("UNONG MultiEtlRecordWriter close called");
+            log.debug("UNONG MultiEtlRecordWriter close called");
             for (String w : dataWriters.keySet()) {
                 log.info("UNONG MultiEtlRecordWriter close dataWritersKey :: " + w);
                 dataWriters.get(w).close(context);
@@ -303,7 +301,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
 
         @Override
         public void write(EtlKey key, Object val) throws IOException, InterruptedException {
-            log.info("UNONG MultiEtlRecordWriter write called");
+            log.debug("UNONG MultiEtlRecordWriter write called");
 //            key.put(new Text("object"), new ObjectWritable(val));
 
             if (val instanceof CamusWrapper<?>) {
@@ -355,7 +353,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
 
 
         public void addCounts(EtlKey key) throws IOException {
-            log.info("UNONG EtlMultiOutputCommitter addCounts called");
+            log.debug("UNONG EtlMultiOutputCommitter addCounts called");
 
             String workingFileName = getWorkingFileName(context, key);
             if (!counts.containsKey(workingFileName))
@@ -366,7 +364,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
         }
 
         public void addOffset(EtlKey key) {
-            log.info("UNONG EtlMultiOutputCommitter addOffset called");
+            log.debug("UNONG EtlMultiOutputCommitter addOffset called");
             String topicPart = key.getTopic() + "-" + key.getLeaderId() + "-" + key.getPartition();
             offsets.put(topicPart, new EtlKey(key));
         }
@@ -374,7 +372,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
         public EtlMultiOutputCommitter(Path outputPath, TaskAttemptContext context)
                 throws IOException {
             super(outputPath, context);
-            log.info("UNONG EtlMultiOutputCommitter called");
+            log.debug("UNONG EtlMultiOutputCommitter called");
 
             this.context = context;
             try {
@@ -387,7 +385,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
 
         @Override
         public void commitTask(TaskAttemptContext context) throws IOException {
-            log.info("UNONG EtlMultiOutputCommitter commitTask called");
+            log.debug("UNONG EtlMultiOutputCommitter commitTask called");
 
         	ArrayList<Map<String,Object>> allCountObject = new ArrayList<Map<String,Object>>();
             FileSystem fs = FileSystem.get(context.getConfiguration());
@@ -448,7 +446,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
         }
 
         public String getPartitionedPath(JobContext context, String file, int count, long offset) throws IOException {
-            log.info("UNONG EtlMultiOutputCommitter getPartitionedPath called");
+            log.debug("UNONG EtlMultiOutputCommitter getPartitionedPath called");
 
             Matcher m = workingFileMetadataPattern.matcher(file);
             if(! m.find()) {
