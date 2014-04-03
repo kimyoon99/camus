@@ -6,18 +6,16 @@ import com.linkedin.camus.coders.MessageDecoderException;
 import com.linkedin.camus.schemaregistry.CachedSchemaRegistry;
 import com.linkedin.camus.schemaregistry.SchemaRegistry;
 import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData.Record;
-import org.apache.avro.generic.GenericDatumReader;
-import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.DecoderFactory;
-import org.apache.hadoop.io.Text;
+import org.apache.avro.specific.SpecificDatumReader;
+import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Properties;
 
-public class KafkaAvroMessageDecoder extends MessageDecoder<byte[], Record> {
+public class KafkaAvroMessageDecoder extends MessageDecoder<byte[], SpecificRecordBase> {
     private static final Logger log = Logger.getLogger(KafkaAvroMessageDecoder.class);
 
 	protected DecoderFactory decoderFactory;
@@ -92,14 +90,15 @@ public class KafkaAvroMessageDecoder extends MessageDecoder<byte[], Record> {
 		}
 
 		public MessageDecoderHelper invoke() {
-			buffer = getByteBuffer(payload);
-			String id = Integer.toString(buffer.getInt());
-			schema = registry.getSchemaByID(topicName, id);
+//			buffer = getByteBuffer(payload);
+//			String id = Integer.toString(buffer.getInt());
+//            log.info("UNONG schema id " + id);
+			schema = registry.getSchemaByID(topicName, null);
 			if (schema == null)
-				throw new IllegalStateException("Unknown schema id: " + id);
+				throw new IllegalStateException("Unknown schema id: null");
 
-			start = buffer.position() + buffer.arrayOffset();
-			length = buffer.limit() - 5;
+//			start = buffer.position() + buffer.arrayOffset();
+//			length = buffer.limit() - 5;
 
 			// try to get a target schema, if any
 			targetSchema = latestSchema;
@@ -107,46 +106,49 @@ public class KafkaAvroMessageDecoder extends MessageDecoder<byte[], Record> {
 		}
 	}
 
-	public CamusWrapper<Record> decode(byte[] payload) {
+    @Override
+    public CamusWrapper<SpecificRecordBase> decode(byte[] payload) {
+        log.info("UNONG decoding ");
 		try {
 			MessageDecoderHelper helper = new MessageDecoderHelper(registry,
 					topicName, payload).invoke();
-			DatumReader<Record> reader = (helper.getTargetSchema() == null) ? new GenericDatumReader<Record>(
-					helper.getSchema()) : new GenericDatumReader<Record>(
+
+            SpecificDatumReader<SpecificRecordBase> reader = (helper.getTargetSchema() == null) ? new SpecificDatumReader<SpecificRecordBase>(
+					helper.getSchema()) : new SpecificDatumReader<SpecificRecordBase>(
 					helper.getSchema(), helper.getTargetSchema());
 
+            log.info("UNONG decoding " + reader.getSchema().getName() + " :: " + reader.getExpected().getName());
 			return new CamusAvroWrapper(reader.read(null, decoderFactory
-                    .binaryDecoder(helper.getBuffer().array(),
-                            helper.getStart(), helper.getLength(), null)));
+                    .binaryDecoder(payload, null)), reader.getSchema());
+//                    .binaryDecoder(helper.getBuffer().array(),
+//                            helper.getStart(), helper.getLength(), null)));
 	
 		} catch (IOException e) {
 			throw new MessageDecoderException(e);
 		}
 	}
 
-	public static class CamusAvroWrapper extends CamusWrapper<Record> {
-
-	    public CamusAvroWrapper(Record record) {
+	public static class CamusAvroWrapper extends CamusWrapper<SpecificRecordBase> {
+        private Schema schema;
+	    public CamusAvroWrapper(SpecificRecordBase record, Schema schema) {
             super(record);
-            Record header = (Record) super.getRecord().get("header");
-   	        if (header != null) {
-               if (header.get("server") != null) {
-                   put(new Text("server"), new Text(header.get("server").toString()));
-               }
-               if (header.get("service") != null) {
-                   put(new Text("service"), new Text(header.get("service").toString()));
-               }
-            }
+            this.schema = schema;
+//            SpecificRecordBase header = (SpecificRecordBase) super.getRecord().get("header");
+//   	        if (header != null) {
+//               if (header.get("server") != null) {
+//                   put(new Text("server"), new Text(header.get("server").toString()));
+//               }
+//               if (header.get("service") != null) {
+//                   put(new Text("service"), new Text(header.get("service").toString()));
+//               }
+//            }
         }
 	    
 	    @Override
 	    public long getTimestamp() {
-	        Record header = (Record) super.getRecord().get("header");
-
-	        if (header != null && header.get("time") != null) {
-	            return (Long) header.get("time");
-	        } else if (super.getRecord().get("timestamp") != null) {
-	            return (Long) super.getRecord().get("timestamp");
+	        if (super.getRecord().get(schema.getField("log_timestamp").pos()) != null) {
+                log.info("UNONG log_timestamp :: " + (Long) super.getRecord().get(schema.getField("log_timestamp").pos()) );
+	            return (Long) super.getRecord().get(schema.getField("log_timestamp").pos());
 	        } else {
 	            return System.currentTimeMillis();
 	        }

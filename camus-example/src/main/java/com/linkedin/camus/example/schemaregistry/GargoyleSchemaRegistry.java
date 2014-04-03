@@ -3,6 +3,7 @@ package com.linkedin.camus.example.schemaregistry;
 import com.linkedin.camus.schemaregistry.MemorySchemaRegistry;
 import net.daum.shopping.gargoyle.entity.common.log.ClickLogAvro;
 import net.daum.shopping.gargoyle.entity.common.log.ImpressionLogAvro;
+import net.daum.shopping.gargoyle.entity.common.log.OldClickLogAvro;
 import org.apache.avro.Schema;
 import org.apache.hadoop.conf.Configuration;
 
@@ -21,5 +22,19 @@ public class GargoyleSchemaRegistry extends MemorySchemaRegistry<Schema> {
 
     public GargoyleSchemaRegistry()  {
         this(null);
+    }
+
+
+    @Override
+    public Schema getSchemaByID(String topicName, String idStr) {
+        /**
+         * 이걸 부르는 케이스는 예전 스키마에 대한 요청임.
+         */
+        if("gClickLogResult".equals(topicName)) {
+            return OldClickLogAvro.newBuilder().build().getSchema();
+        } else if("gImpressionLogResult".equals(topicName)) {
+            return ImpressionLogAvro.newBuilder().build().getSchema();
+        }
+        return null;
     }
 }

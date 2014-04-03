@@ -9,7 +9,7 @@
 
 	<groupId>com.linkedin.camus</groupId>
 	<artifactId>camus-parent</artifactId>
-	<version>0.2.8</version>
+	<version>0.2.21</version>
 	<packaging>pom</packaging>
 	<name>Camus Parent</name>
 	<description>
@@ -26,22 +26,22 @@
 			<dependency>
 				<groupId>com.linkedin.camus</groupId>
 				<artifactId>camus-api</artifactId>
-				<version>0.2.8</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.linkedin.camus</groupId>
 				<artifactId>camus-etl-kafka</artifactId>
-				<version>0.2.8</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.linkedin.camus</groupId>
 				<artifactId>camus-schema-registry</artifactId>
-				<version>0.2.8</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.linkedin.camus</groupId>
 				<artifactId>camus-schema-registry</artifactId>
-				<version>0.2.8</version>
+				<version>${project.version}</version>
 				<type>test-jar</type>
 				<scope>test</scope>
 			</dependency>
@@ -162,10 +162,6 @@
 
 	<repositories>
         <repository>
-            <id>cloudera</id>
-            <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
-        </repository>
-        <repository>
             <id>daum-shopping</id>
             <url>http://maven.daumcorp.com/content/repositories/daum-shopping-group/</url>
             <releases>
@@ -176,6 +172,10 @@
                 <enabled>true</enabled>
                 <updatePolicy>never</updatePolicy>
             </snapshots>
+        </repository>
+        <repository>
+            <id>cloudera</id>
+            <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
         </repository>
 		<repository>
 			<id>apache-releases</id>
@@ -189,7 +189,6 @@
             <name>Daum Repository</name>
             <url>http://maven.daumcorp.com/content/repositories/daum</url>
         </repository>
-
         <snapshotRepository>
             <id>daum-snapshots</id>
             <name>Daum Snapshot Repository</name>

@@ -1,10 +1,10 @@
 {
     "namespace" : "net.daum.shopping.gargoyle.entity.common.log",
     "type" : "record",
-    "name" : "ClickLogAvro",
+    "name" : "OldClickLogAvro",
     "doc" : "클릭 로그 정의",
     "fields" : [
-        {"name" :"log_type", "type" : ["string", "null"], "default" : "abnormal"}
+        {"name" :"log_type", "type" : ["string"], "default" : "abnormal"}
         , {"name" :"log_extension", "type" : ["null", "string"], "default" : null}
         , {"name" :"log_dttm", "type" : ["null", "string"], "default" : null}
         , {"name" :"log_dt", "type" : ["null", "string"], "default" : null}
@@ -33,14 +33,11 @@
         , {"name" :"click_url", "type" : ["null", "string"], "default" : null}
         , {"name" :"click_text", "type" : ["null", "string"], "default" : null}
         , {"name" :"click_img", "type" : ["null", "string"], "default" : null}
-        , {"name" :"click_total_ordernum", "type" : ["null", "int"], "default" : null}
         , {"name" :"click_ordernum", "type" : ["null", "int"], "default" : null}
         , {"name" :"click_setnum", "type" : ["null", "int"], "default" : null}
         , {"name" :"click_x", "type" : ["null", "int"], "default" : null}
         , {"name" :"click_y", "type" : ["null", "int"], "default" : null}
-        , {"name" :"browser_width", "type" : ["null", "int"], "default" : null}
-        , {"name" :"browser_height", "type" : ["null", "int"], "default" : null}
-        , {"name" :"tmplid", "type" : ["null", "string"], "default" : null}
+        , {"name" :"tempid", "type" : ["null", "string"], "default" : null}
         , {"name" :"grpid", "type" : ["null", "string"], "default" : null}
         , {"name" :"areaid", "type" : ["null", "string"], "default" : null}
         , {"name" :"dataseq", "type" : ["null", "string"], "default" : null}
@@ -53,7 +50,7 @@
         , {"name" :"ordareaseq", "type" : ["null", "string"], "default" : null}
         , {"name" :"ordaccount", "type" : ["null", "int"], "default" : null}
         , {"name" :"price", "type" : ["null", "int"], "default" : null}
-        , {"name" :"cpc_price", "type" : ["null", "double"], "default" : null}
+        , {"name" :"cpc_price", "type" : ["null", "int"], "default" : null}
         , {"name" :"compseq", "type" : ["null", "string"], "default" : null}
         , {"name" :"search_query", "type" : ["null", "string"], "default" : null}
         , {"name" :"search_query_type", "type" : ["null", "string"], "default" : null}
