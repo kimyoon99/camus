@@ -1,5 +1,6 @@
 package com.linkedin.camus.example.schemaregistry;
 
+import com.linkedin.camus.schemaregistry.AvroSchemaIdRegistry;
 import com.linkedin.camus.schemaregistry.MemorySchemaRegistry;
 import net.daum.shopping.gargoyle.entity.common.log.ClickLogAvro;
 import net.daum.shopping.gargoyle.entity.common.log.ImpressionLogAvro;
@@ -7,15 +8,21 @@ import net.daum.shopping.gargoyle.entity.common.log.OldClickLogAvro;
 import org.apache.avro.Schema;
 import org.apache.hadoop.conf.Configuration;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Created with IntelliJ IDEA.
  * User: unong
  * Date: 12/5/13
  * Time: 12:47 PM
  */
-public class GargoyleSchemaRegistry extends MemorySchemaRegistry<Schema> {
+public class GargoyleSchemaRegistry extends MemorySchemaRegistry<Schema> implements AvroSchemaIdRegistry {
+    private final Map<Schema, String> schemaIdMap = new ConcurrentHashMap<Schema, String>();
+
     public GargoyleSchemaRegistry(Configuration conf) {
         super();
+
         super.register("gClickLogResult", ClickLogAvro.newBuilder().build().getSchema());
         super.register("gImpressionLogResult", ImpressionLogAvro.newBuilder().build().getSchema());
     }
@@ -35,6 +42,13 @@ public class GargoyleSchemaRegistry extends MemorySchemaRegistry<Schema> {
         } else if("gImpressionLogResult".equals(topicName)) {
             return ImpressionLogAvro.newBuilder().build().getSchema();
         }
+        return null;
+    }
+
+    @Override
+    public String getSchemaId(Schema schema) {
+
+
         return null;
     }
 }
