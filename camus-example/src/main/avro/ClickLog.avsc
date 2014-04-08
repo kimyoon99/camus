@@ -4,64 +4,64 @@
     "name" : "ClickLogAvro",
     "doc" : "클릭 로그 정의",
     "fields" : [
-        {"name" :"log_type", "type" : ["string", "null"], "default" : "abnormal"}
-        , {"name" :"log_extension", "type" : ["null", "string"], "default" : null}
-        , {"name" :"log_dttm", "type" : ["null", "string"], "default" : null}
-        , {"name" :"log_dt", "type" : ["null", "string"], "default" : null}
-        , {"name" :"log_hour", "type" : ["null", "string"], "default" : null}
-        , {"name" :"log_tmin", "type" : ["null", "string"], "default" : null}
-        , {"name" :"log_timestamp", "type" : ["null", "long"], "default" : null}
-        , {"name" :"external_inflow_domain", "type" : ["null", "string"], "default" : null}
-        , {"name" :"puid", "type" : ["null", "string"], "default" : null}
-        , {"name" :"uuid", "type" : ["null", "string"], "default" : null}
-        , {"name" :"suid", "type" : ["null", "string"], "default" : null}
-        , {"name" :"biryr", "type" : ["null", "string"], "default" : null}
-        , {"name" :"sex", "type" : ["null", "string"], "default" : null}
-        , {"name" :"userid", "type" : ["null", "string"], "default" : null}
-        , {"name" :"islogin", "type" : ["null", "string"], "default" : null}
-        , {"name" :"client_page_url", "type" : ["null", "string"], "default" : null}
-        , {"name" :"ip", "type" : ["null", "string"], "default" : null}
-        , {"name" :"referer", "type" : ["null", "string"], "default" : null}
-        , {"name" :"user_agent", "type" : ["null", "string"], "default" : null}
-        , {"name" :"svcdevice", "type" : ["null", "string"], "default" : null}
-        , {"name" :"svcdomain", "type" : ["null", "string"], "default" : null}
-        , {"name" :"section1", "type" : ["null", "string"], "default" : null}
-        , {"name" :"section2", "type" : ["null", "string"], "default" : null}
-        , {"name" :"section3", "type" : ["null", "string"], "default" : null}
-        , {"name" :"page_name", "type" : ["null", "string"], "default" : null}
-        , {"name" :"layer", "type" : ["null", "string"], "default" : null}
-        , {"name" :"click_url", "type" : ["null", "string"], "default" : null}
-        , {"name" :"click_text", "type" : ["null", "string"], "default" : null}
-        , {"name" :"click_img", "type" : ["null", "string"], "default" : null}
+        {"name" :"log_type", "aliases" : ["log_type"], "type" : ["string", "null"], "default" : "abnormal"}
+        , {"name" :"log_extension", "aliases" : ["log_extension"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"log_dttm", "aliases" : ["log_dttm"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"log_dt", "aliases" : ["log_dt"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"log_hour", "aliases" : ["log_hour"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"log_tmin", "aliases" : ["log_tmin"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"log_timestamp", "aliases" : ["log_timestamp"], "type" : ["null", "long"], "default" : null}
+        , {"name" :"external_inflow_domain", "aliases" : ["external_inflow_domain"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"puid", "aliases" : ["puid"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"uuid", "aliases" : ["uuid"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"suid", "aliases" : ["suid"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"biryr", "aliases" : ["biryr"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"sex", "aliases" : ["sex"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"userid", "aliases" : ["userid"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"islogin", "aliases" : ["islogin"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"client_page_url", "aliases" : ["client_page_url"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"ip", "aliases" : ["ip"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"referer", "aliases" : ["referer"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"user_agent", "aliases" : ["user_agent"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"svcdevice", "aliases" : ["svcdevice"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"svcdomain", "aliases" : ["svcdomain"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"section1", "aliases" : ["section1"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"section2", "aliases" : ["section2"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"section3", "aliases" : ["section3"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"page_name", "aliases" : ["page_name"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"layer", "aliases" : ["layer"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"click_url", "aliases" : ["click_url"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"click_text", "aliases" : ["click_text"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"click_img", "aliases" : ["click_img"], "type" : ["null", "string"], "default" : null}
         , {"name" :"click_total_ordernum", "type" : ["null", "int"], "default" : null}
-        , {"name" :"click_ordernum", "type" : ["null", "int"], "default" : null}
-        , {"name" :"click_setnum", "type" : ["null", "int"], "default" : null}
-        , {"name" :"click_x", "type" : ["null", "int"], "default" : null}
-        , {"name" :"click_y", "type" : ["null", "int"], "default" : null}
+        , {"name" :"click_ordernum", "aliases" : ["click_ordernum"], "type" : ["null", "int"], "default" : null}
+        , {"name" :"click_setnum", "aliases" : ["click_setnum"], "type" : ["null", "int"], "default" : null}
+        , {"name" :"click_x", "aliases" : ["click_x"], "type" : ["null", "int"], "default" : null}
+        , {"name" :"click_y", "aliases" : ["click_y"], "type" : ["null", "int"], "default" : null}
         , {"name" :"browser_width", "type" : ["null", "int"], "default" : null}
         , {"name" :"browser_height", "type" : ["null", "int"], "default" : null}
-        , {"name" :"tmplid", "type" : ["null", "string"], "default" : null}
-        , {"name" :"grpid", "type" : ["null", "string"], "default" : null}
-        , {"name" :"areaid", "type" : ["null", "string"], "default" : null}
-        , {"name" :"dataseq", "type" : ["null", "string"], "default" : null}
-        , {"name" :"kindcode", "type" : ["null", "string"], "default" : null}
-        , {"name" :"prodid", "type" : ["null", "string"], "default" : null}
-        , {"name" :"shopid", "type" : ["null", "string"], "default" : null}
-        , {"name" :"cateid", "type" : ["null", "string"], "default" : null}
-        , {"name" :"adc", "type" : ["null", "string"], "default" : null}
-        , {"name" :"ad", "type" : ["null", "string"], "default" : null}
-        , {"name" :"ordareaseq", "type" : ["null", "string"], "default" : null}
-        , {"name" :"ordaccount", "type" : ["null", "int"], "default" : null}
-        , {"name" :"price", "type" : ["null", "int"], "default" : null}
-        , {"name" :"cpc_price", "type" : ["null", "double"], "default" : null}
-        , {"name" :"compseq", "type" : ["null", "string"], "default" : null}
-        , {"name" :"search_query", "type" : ["null", "string"], "default" : null}
-        , {"name" :"search_query_type", "type" : ["null", "string"], "default" : null}
-        , {"name" :"search_category", "type" : ["null", "string"], "default" : null}
-        , {"name" :"search_page", "type" : ["null", "int"], "default" : null}
+        , {"name" :"tmplid", "aliases" : ["tempid"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"grpid", "aliases" : ["grpid"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"areaid", "aliases" : ["areaid"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"dataseq", "aliases" : ["dataseq"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"kindcode", "aliases" : ["kindcode"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"prodid", "aliases" : ["prodid"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"shopid", "aliases" : ["shopid"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"cateid", "aliases" : ["cateid"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"adc", "aliases" : ["adc"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"ad", "aliases" : ["ad"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"ordareaseq", "aliases" : ["ordareaseq"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"ordaccount", "aliases" : ["ordaccount"], "type" : ["null", "int"], "default" : null}
+        , {"name" :"price", "aliases" : ["price"], "type" : ["null", "int"], "default" : null}
+        , {"name" :"cpc_price", "aliases" : ["cpc_price"], "type" : ["null", "double"], "default" : null}
+        , {"name" :"compseq", "aliases" : ["compseq"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"search_query", "aliases" : ["search_query"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"search_query_type", "aliases" : ["search_query_type"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"search_category", "aliases" : ["search_category"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"search_page", "aliases" : ["search_page"], "type" : ["null", "int"], "default" : null}
         , {"name" :"search_qa_query", "type" : ["null", "string"], "default" : null}
-        , {"name" :"search_view_type", "type" : ["null", "string"], "default" : null}
-        , {"name" :"has_error", "type" : ["null", "boolean"], "default" : null}
-        , {"name" :"error_code", "type" : ["null", "string"], "default" : null}
+        , {"name" :"search_view_type", "aliases" : ["search_view_type"], "type" : ["null", "string"], "default" : null}
+        , {"name" :"has_error", "aliases" : ["has_error"], "type" : ["null", "boolean"], "default" : null}
+        , {"name" :"error_code", "aliases" : ["error_code"], "type" : ["null", "string"], "default" : null}
     ]
 }

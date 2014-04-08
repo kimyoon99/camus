@@ -108,7 +108,7 @@ public class KafkaAvroMessageDecoder extends MessageDecoder<byte[], SpecificReco
 
     @Override
     public CamusWrapper<SpecificRecordBase> decode(byte[] payload) {
-        log.info("UNONG decoding ");
+//        log.info("UNONG decoding ");
 		try {
 			MessageDecoderHelper helper = new MessageDecoderHelper(registry,
 					topicName, payload).invoke();
@@ -117,7 +117,7 @@ public class KafkaAvroMessageDecoder extends MessageDecoder<byte[], SpecificReco
 					helper.getSchema()) : new SpecificDatumReader<SpecificRecordBase>(
 					helper.getSchema(), helper.getTargetSchema());
 
-            log.info("UNONG decoding " + reader.getSchema().getName() + " :: " + reader.getExpected().getName());
+//            log.info("UNONG decoding " + reader.getSchema().getName() + " :: " + reader.getExpected().getName());
 			return new CamusAvroWrapper(reader.read(null, decoderFactory
                     .binaryDecoder(payload, null)), reader.getSchema());
 //                    .binaryDecoder(helper.getBuffer().array(),
@@ -147,7 +147,7 @@ public class KafkaAvroMessageDecoder extends MessageDecoder<byte[], SpecificReco
 	    @Override
 	    public long getTimestamp() {
 	        if (super.getRecord().get(schema.getField("log_timestamp").pos()) != null) {
-                log.info("UNONG log_timestamp :: " + (Long) super.getRecord().get(schema.getField("log_timestamp").pos()) );
+//                log.info("UNONG log_timestamp :: " + (Long) super.getRecord().get(schema.getField("log_timestamp").pos()) );
 	            return (Long) super.getRecord().get(schema.getField("log_timestamp").pos());
 	        } else {
 	            return System.currentTimeMillis();
